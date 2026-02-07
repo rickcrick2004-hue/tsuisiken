@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>中3追試験対策アプリ</title>
+    <meta name="description" content="中学理科の重要語句・公式定着アプリ">
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --chem: #4facfe;   /* Chemistry Blue */
+            --bio: #43e97b;    /* Biology Green */
+            --phys: #fa709a;   /* Physics Orange/Red */
+            --mix: #a18cd1;    /* Mix Purple */
+            --dark: #2d3436;
+            --gray: #dfe6e9;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --radius: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- Header --- */
+        header {
+            background: var(--dark);
+            color: var(--white);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            z-index: 10;
+            position: relative;
+        }
+        h1 { margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        #ver-display { font-size: 0.7rem; color: #b2bec3; display: block; margin-top: 4px; }
+        
+        .btn-ranking-header {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        .btn-ranking-header:active {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* --- Main Layout --- */
+        main {
+            flex: 1;
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- Screens & Transitions --- */
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .screen.active {
+            display: block;
+            opacity: 1;
+            animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- Menu Buttons --- */
+        .category-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+        .category-card:active { transform: scale(0.98); box-shadow: none; }
+        
+        .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .cat-title { font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .cat-progress { font-size: 0.9rem; color: #636e72; }
+        
+        /* Progress Bar */
+        .progress-track { height: 6px; background: var(--gray); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
+
+        .c-chem .cat-title { color: #0984e3; }
+        .c-chem .progress-fill { background: var(--chem); }
+        
+        .c-bio .cat-title { color: #00b894; }
+        .c-bio .progress-fill { background: var(--bio); }
+        
+        .c-phys .cat-title { color: #d63031; }
+        .c-phys .progress-fill { background: var(--phys); }
+
+        .c-mix .cat-title { color: #6c5ce7; }
+        .c-mix .progress-fill { background: var(--mix); }
+
+        .c-weak { border: 2px solid #ff7675; background: #fff0f0; }
+        .c-weak .cat-title { color: #d63031; }
+
+        /* --- Game HUD --- */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            font-weight: bold;
+            font-feature-settings: "tnum";
+        }
+        .combo-counter { color: #fdcb6e; text-shadow: 1px 1px 0 #b2bec3; }
+
+        /* --- Question Card --- */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem 1.5rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            position: relative;
+        }
+        .badge-type {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* --- Action Area --- */
+        .action-area { text-align: center; }
+        .btn-main {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: var(--radius);
+            background: var(--dark);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+        .btn-main:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- Choices Grid --- */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .btn-choice {
+            background: var(--white);
+            border: 2px solid var(--gray);
+            color: var(--dark);
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.1s;
+        }
+        .btn-choice:active { background: #dfe6e9; transform: scale(0.98); }
+
+        /* --- Modal (Generic & Result) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .modal-overlay.visible { opacity: 1; }
+        
+        .modal-content {
+            background: var(--white);
+            width: 85%;
+            max-width: 400px;
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+
+        .result-icon { font-size: 4rem; margin-bottom: 0.5rem; display: block; }
+        .result-correct { color: #00b894; }
+        .result-wrong { color: #d63031; }
+        
+        .exp-box {
+            background: #f1f2f6;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: left;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--dark);
+        }
+        .exp-tag {
+            font-size: 0.75rem;
+            color: #636e72;
+            display: block;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        /* --- Settings Modal (Question Count) --- */
+        .count-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .btn-count {
+            background: var(--white);
+            border: 2px solid var(--gray);
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            color: var(--dark);
+            cursor: pointer;
+        }
+        .btn-count:active { background: #dfe6e9; }
+
+        /* --- Ranking --- */
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--gray);
+            font-weight: bold;
+        }
+        .rank-badge {
+            display: inline-block;
+            width: 24px;
+            text-align: center;
+            margin-right: 8px;
+            color: #b2bec3;
+        }
+        .rank-1 { color: #fdcb6e; font-size: 1.2rem; }
+        .rank-2 { color: #b2bec3; font-size: 1.1rem; }
+        .rank-3 { color: #e17055; font-size: 1.1rem; }
+
+        /* --- List Mode (Red Sheet) --- */
+        .list-header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .btn-back-list {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+        .list-stats { font-size: 0.9rem; color: #666; }
+
+        /* Tabs */
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.8rem 0.5rem;
+            background: var(--white);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #666;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--dark);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .tab-btn.t-chem.active { background: var(--chem); }
+        .tab-btn.t-bio.active { background: var(--bio); }
+        .tab-btn.t-phys.active { background: var(--phys); }
+
+        .list-container { padding-bottom: 80px; }
+        .list-item {
+            background: var(--white);
+            margin-bottom: 10px;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 6px solid #ccc;
+            position: relative;
+        }
+        .list-item.chem { border-color: var(--chem); }
+        .list-item.bio { border-color: var(--bio); }
+        .list-item.phys { border-color: var(--phys); }
+
+        .q-num {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #b2bec3;
+            background: #f1f2f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .ans-hidden {
+            background: #ff7675;
+            color: transparent;
+            border-radius: 4px;
+            padding: 0 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ans-hidden.revealed { background: transparent; color: #d63031; font-weight: bold; }
+        
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            border: none;
+            cursor: pointer;
+            z-index: 50;
+        }
+
+        /* --- Animations --- */
+        @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
+        .anim-pop { animation: pop 0.4s forwards; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>中3追試験対策アプリ</h1>
+    <span id="ver-display"></span>
+    <button class="btn-ranking-header" onclick="App.showRanking()">🏆 ランキング</button>
+</header>
+
+<main>
+    <!-- MENU SCREEN -->
+    <div id="screen-menu" class="screen active">
+        <p style="text-align:center; color:#636e72; margin-bottom:1.5rem;">
+            目指せ完全制覇！<br>
+            <small style="line-height:1.6; display:block;">
+                各問題に<strong style="color:var(--dark); border-bottom:2px solid var(--mix);">5回正解</strong>すると「習得済」になります。<br>
+                習熟度に合わせて出題されます。
+            </small>
+        </p>
+
+        <div class="category-card c-chem" onclick="App.openSettings('chem')">
+            <div class="cat-header">
+                <span class="cat-title">🧪 化学 (Chemistry)</span>
+                <span class="cat-progress" id="prog-text-chem">0%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="prog-bar-chem"></div></div>
+        </div>
+
+        <div class="category-card c-bio" onclick="App.openSettings('bio')">
+            <div class="cat-header">
+                <span class="cat-title">🧬 生物 (Biology)</span>
+                <span class="cat-progress" id="prog-text-bio">0%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="prog-bar-bio"></div></div>
+        </div>
+
+        <div class="category-card c-phys" onclick="App.openSettings('phys')">
+            <div class="cat-header">
+                <span class="cat-title">⚡ 物理 (Physics)</span>
+                <span class="cat-progress" id="prog-text-phys">0%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="prog-bar-phys"></div></div>
+        </div>
+
+        <!-- ALL MIX -->
+        <div class="category-card c-mix" onclick="App.openSettings('mix')">
+            <div class="cat-header">
+                <span class="cat-title">🌀 全部ミックス (All)</span>
+                <span class="cat-progress" style="font-size:0.8rem">実力テスト対策</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:100%; background:var(--mix); opacity:0.3;"></div></div>
+        </div>
+
+        <div class="category-card c-weak" onclick="App.openSettings('weak')">
+            <div class="cat-header">
+                <span class="cat-title">🔥 苦手特訓</span>
+                <span class="cat-progress" id="weak-count">0問</span>
+            </div>
+            <div style="font-size:0.8rem; color:#d63031;">正答率の低い問題を集中攻撃！</div>
+        </div>
+
+        <button class="btn-main" style="background:#636e72; margin-top:1rem;" onclick="App.showList()">📚 暗記リスト (赤シート)</button>
+        <div style="text-align:center; margin-top:2rem;">
+            <button onclick="App.resetData()" style="background:none; border:none; color:#ccc; text-decoration:underline; font-size:0.8rem;">データをリセット</button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="screen-game" class="screen">
+        <div class="hud">
+            <span>Score: <span id="score-val">0</span></span>
+            <span class="combo-counter">Combo: <span id="combo-val">0</span></span>
+        </div>
+
+        <div class="card">
+            <span class="badge-type" id="q-badge">CHEM</span>
+            <div id="q-text">問題文がここに表示されます</div>
+        </div>
+
+        <!-- Phase 1: Think -->
+        <div id="phase-1" class="action-area">
+            <p style="color:#636e72; margin-bottom:1rem;">↓ 声に出して答えよう ↓</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn-main" style="background:#b2bec3; color:white;" onclick="Game.handleSelfCheck(false)">言えなかった</button>
+                <button class="btn-main" style="background:var(--bio); color:white;" onclick="Game.handleSelfCheck(true)">言えた！</button>
+            </div>
+        </div>
+
+        <!-- Phase 2: Answer (4 Choices) -->
+        <div id="phase-2" class="choices-grid" style="display:none;">
+            <!-- Buttons injected by JS -->
+        </div>
+
+        <!-- Return to Home Button -->
+        <div style="text-align:center; margin-top:2rem;">
+            <button onclick="App.goHome()" style="background:none; border:none; color:#636e72; font-size:0.9rem; cursor:pointer; text-decoration:underline;">🏠 メニューへ戻る</button>
+        </div>
+    </div>
+
+    <!-- LIST SCREEN -->
+    <div id="screen-list" class="screen">
+        <!-- List Header -->
+        <div class="list-header-area">
+            <button class="btn-back-list" onclick="App.goHome()">
+                <span style="font-size:1.2rem; margin-right:4px;">←</span> ホームに戻る
+            </button>
+            <div class="list-stats">全 <span id="list-total-count">0</span> 問</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-container">
+            <button id="tab-chem" class="tab-btn t-chem" onclick="App.switchTab('chem')">化学</button>
+            <button id="tab-bio" class="tab-btn t-bio" onclick="App.switchTab('bio')">生物</button>
+            <button id="tab-phys" class="tab-btn t-phys" onclick="App.switchTab('phys')">物理</button>
+        </div>
+
+        <div id="list-container" class="list-container"></div>
+        
+        <!-- Floating Action Button (Alternative Back) -->
+        <button class="fab" onclick="App.goHome()">🏠</button>
+    </div>
+</main>
+
+<!-- SETTINGS MODAL -->
+<div id="modal-settings" class="modal-overlay">
+    <div class="modal-content">
+        <h2 id="settings-title">設定</h2>
+        <p>問題数を選んでください</p>
+        <div class="count-grid">
+            <button class="btn-count" onclick="App.startGame(10)">10問</button>
+            <button class="btn-count" onclick="App.startGame(20)">20問</button>
+            <button class="btn-count" onclick="App.startGame(30)">30問</button>
+            <button class="btn-count" onclick="App.startGame(999)" style="background:var(--dark); color:white;">全問</button>
+        </div>
+        <button class="btn-main" onclick="document.getElementById('modal-settings').style.display='none'" style="background:#95a5a6; margin-top:1rem;">キャンセル</button>
+    </div>
+</div>
+
+<!-- RESULT/EXPLANATION MODAL -->
+<div id="modal-result" class="modal-overlay">
+    <div class="modal-content">
+        <span id="res-icon" class="result-icon">⭕</span>
+        <h2 id="res-title" style="margin:0 0 1rem 0;">正解！</h2>
+        <div id="res-ans-display" style="margin-bottom:1rem;"></div>
+        
+        <div class="exp-box">
+            <div id="res-exp">解説テキスト</div>
+            <span class="exp-tag">高校入試・基礎固めポイント</span>
+        </div>
+
+        <button id="btn-next" class="btn-main" onclick="Game.nextQuestion()">次の問題へ</button>
+    </div>
+</div>
+
+<!-- RANKING MODAL -->
+<div id="modal-ranking" class="modal-overlay">
+    <div class="modal-content">
+        <h2>🏆 ランキング (Top 5)</h2>
+        <ul id="ranking-list" class="ranking-list">
+            <!-- Injected by JS -->
+        </ul>
+        <button class="btn-main" onclick="document.getElementById('modal-ranking').style.display='none'" style="margin-top:1rem;">閉じる</button>
+    </div>
+</div>
+
+<script>
+/**
+ * ---------------------------------------------------------
+ * DATA & CONFIGURATION
+ * ---------------------------------------------------------
+ */
+const CONFIG = {
+    ver: "ver 3.5.1",
+    passScore: 5 // 5 times to master
+};
+
+// 問題データベース
+const QUESTIONS = [
+    // --- 化学 (Chemistry) ---
+    { id: 'c1', type: 'chem', q: '塩化銅水溶液を電気分解したとき、陰極に付着する物質は？', choices: ['銅', '塩素', '水素', '酸素'], ans: '銅', exp: '陰極には陽イオン（Cu²⁺）が引き寄せられ、銅原子になります。' },
+    { id: 'c2', type: 'chem', q: 'アンモニアを集める最も適した方法は？', choices: ['上方置換法', '下方置換法', '水上置換法', '蒸留'], ans: '上方置換法', exp: 'アンモニアは水に溶けやすく、空気より軽いため上方置換法を用います。' },
+    { id: 'c3', type: 'chem', q: '酸化銀を加熱分解した時の化学反応式は？', choices: ['2Ag₂O → 4Ag + O₂', 'Ag₂O → 2Ag + O', '2AgO → 2Ag + O₂', 'Ag + O → AgO'], ans: '2Ag₂O → 4Ag + O₂', exp: '酸素は分子(O₂)として発生します。原子の数を合わせましょう。' },
+    { id: 'c4', type: 'chem', q: '酸性の水溶液に共通して含まれるイオンは？', choices: ['水素イオン', '水酸化物イオン', 'ナトリウムイオン', '塩化物イオン'], ans: '水素イオン', exp: 'H⁺が酸性の正体です。アルカリ性はOH⁻です。' },
+    { id: 'c5', type: 'chem', q: '質量保存の法則に関係が深い科学者は？', choices: ['ラボアジエ', 'ドルトン', 'プルースト', 'メンデレーエフ'], ans: 'ラボアジエ', exp: '「化学反応の前後で物質全体の質量は変わらない」という法則です。' },
+    { id: 'c6', type: 'chem', q: 'ベーキングパウダーの主成分で、熱分解すると二酸化炭素を出す物質は？', choices: ['炭酸水素ナトリウム', '炭酸ナトリウム', '塩化ナトリウム', '水酸化ナトリウム'], ans: '炭酸水素ナトリウム', exp: '2NaHCO₃ → Na₂CO₃ + H₂O + CO₂ の反応です。' },
+    { id: 'c7', type: 'chem', q: '鉄と硫黄の混合物を加熱してできる物質は？', choices: ['硫化鉄', '酸化鉄', '塩化鉄', '硫化銅'], ans: '硫化鉄', exp: 'Fe + S → FeS。腐卵臭のある気体（硫化水素）を発生させる元になります。' },
+    { id: 'c8', type: 'chem', q: '酸化銅に炭素を混ぜて加熱すると銅ができる反応を何という？', choices: ['還元', '酸化', '中和', '電気分解'], ans: '還元', exp: '酸化物から酸素を取り除く反応です。同時に炭素は酸化されています。' },
+    { id: 'c9', type: 'chem', q: '赤色リトマス紙を青色に変える水溶液の性質は？', choices: ['アルカリ性', '酸性', '中性', '揮発性'], ans: 'アルカリ性', exp: '「青」ならアルカリ性。酸性は青色リトマス紙を赤色に変えます。' },
+    { id: 'c10', type: 'chem', q: 'BTB溶液が黄色になるのは何性の水溶液？', choices: ['酸性', '中性', 'アルカリ性', '塩基性'], ans: '酸性', exp: '酸性：黄、中性：緑、アルカリ性：青です。' },
+    { id: 'c11', type: 'chem', q: 'フェノールフタレイン溶液が赤色になるのは？', choices: ['アルカリ性', '酸性', '中性', 'すべて'], ans: 'アルカリ性', exp: '酸性と中性では無色です。アルカリ性の検出に使われます。' },
+    { id: 'c12', type: 'chem', q: '塩酸と水酸化ナトリウム水溶液を混ぜた時にできる「塩」は？', choices: ['塩化ナトリウム', '塩化アンモニウム', '硫酸バリウム', '硝酸カリウム'], ans: '塩化ナトリウム', exp: 'HCl + NaOH → NaCl + H₂O。食塩水ができます。' },
+    { id: 'c13', type: 'chem', q: '硫酸と水酸化バリウムを混ぜた時にできる白い沈殿は？', choices: ['硫酸バリウム', '塩化バリウム', '炭酸バリウム', '水酸化硫酸'], ans: '硫酸バリウム', exp: '水に溶けにくいため、白い沈殿となります。' },
+    { id: 'c14', type: 'chem', q: '密度を求める公式は？', choices: ['質量 ÷ 体積', '質量 × 体積', '体積 ÷ 質量', '質量 ＋ 体積'], ans: '質量 ÷ 体積', exp: '単位は g/cm³ などが使われます。「し・み・た」で覚えましょう。' },
+    { id: 'c15', type: 'chem', q: '水素の性質として正しいものは？', choices: ['火を近づけると音を立てて燃える', '線香を入れると激しく燃える', '石灰水を白く濁らせる', '水に非常によく溶ける'], ans: '火を近づけると音を立てて燃える', exp: '最も軽い気体で、燃えると水(H₂O)になります。' },
+    { id: 'c16', type: 'chem', q: '酸素の性質を確認する方法は？', choices: ['火のついた線香を入れる', 'マッチの火を近づける', '石灰水に通す', 'フェノールフタレインを加える'], ans: '火のついた線香を入れる', exp: '酸素には「助燃性（ものを燃やす働き）」があるため、線香が激しく燃えます。' },
+    { id: 'c17', type: 'chem', q: '二酸化炭素を確認する方法は？', choices: ['石灰水に通す', 'リトマス紙をつける', '火を近づける', 'ヨウ素液を加える'], ans: '石灰水に通す', exp: '石灰水が白く濁れば二酸化炭素です。' },
+    { id: 'c18', type: 'chem', q: '液体を沸騰させ、出てくる気体を冷やして再び液体として取り出す操作は？', choices: ['蒸留', 'ろ過', '再結晶', '昇華'], ans: '蒸留', exp: '沸点の違いを利用して物質を分離する方法です。' },
+    { id: 'c19', type: 'chem', q: '1種類の物質だけでできているものを何という？', choices: ['純粋な物質', '混合物', '化合物', '有機物'], ans: '純粋な物質', exp: '水や酸素などは純粋な物質。空気や食塩水は混合物です。' },
+    { id: 'c20', type: 'chem', q: '2種類以上の原子が結びついてできている純粋な物質は？', choices: ['化合物', '単体', '混合物', '原子'], ans: '化合物', exp: '水(H₂O)や二酸化炭素(CO₂)は化合物。酸素(O₂)や鉄(Fe)は単体です。' },
+    { id: 'c21', type: 'chem', q: '原子の中心にある、+の電気を帯びた粒子を含む部分は？', choices: ['原子核', '電子', '分子', '中性子'], ans: '原子核', exp: '原子核（陽子＋中性子）の周りを電子が回っています。' },
+    { id: 'c22', type: 'chem', q: 'マグネシウムを燃焼させた時の化学反応式は？', choices: ['2Mg + O₂ → 2MgO', 'Mg + O → MgO', 'Mg + O₂ → MgO₂', '2Mg + O → Mg₂O'], ans: '2Mg + O₂ → 2MgO', exp: '酸化マグネシウム(MgO)ができます。' },
+    { id: 'c23', type: 'chem', q: '周囲の熱を奪い、温度が下がる反応を何という？', choices: ['吸熱反応', '発熱反応', '中和反応', '酸化反応'], ans: '吸熱反応', exp: '尿素と水の反応などが有名です。逆は発熱反応（カイロなど）。' },
+    { id: 'c24', type: 'chem', q: '使い捨てカイロが温かくなるのは何の反応？', choices: ['鉄の酸化', '鉄の還元', '鉄の蒸発', '鉄の融解'], ans: '鉄の酸化', exp: '鉄が空気中の酸素と反応して酸化鉄になる時の発熱を利用しています。' },
+    { id: 'c25', type: 'chem', q: '定比例の法則を提唱した科学者は？', choices: ['プルースト', 'ドルトン', 'アボガドロ', 'メンデレーエフ'], ans: 'プルースト', exp: '「化合物を構成する成分元素の質量の比は常に一定である」という法則です。' },
+    { id: 'c26', type: 'chem', q: '水素と酸素が反応して水ができる燃料電池。排出されるのは？', choices: ['水', '二酸化炭素', '窒素酸化物', '硫黄酸化物'], ans: '水', exp: '環境に優しい発電方法として注目されています。' },
+    { id: 'c27', type: 'chem', q: '有機物が燃えると必ず発生する2つの物質は？', choices: ['水と二酸化炭素', '水素と酸素', '窒素と水', '炭素と酸素'], ans: '水と二酸化炭素', exp: '有機物は炭素と水素を含んでいるためです。' },
+    { id: 'c28', type: 'chem', q: 'デンプンにヨウ素液を加えると何色になる？', choices: ['青紫色', '赤褐色', '黄色', '無色'], ans: '青紫色', exp: 'デンプンの検出反応の基本です。' },
+    { id: 'c29', type: 'chem', q: '砂糖やエタノールのように、水に溶けても電流を流さない物質は？', choices: ['非電解質', '電解質', '絶縁体', '半導体'], ans: '非電解質', exp: '食塩や塩酸など、イオンに分かれる物質は電解質です。' },
+    { id: 'c30', type: 'chem', q: '原子全体としては電気的にどうなっている？', choices: ['中性', 'プラス', 'マイナス', '不安定'], ans: '中性', exp: '陽子のプラスと電子のマイナスの数が等しいため、全体では打ち消し合います。' },
+    { id: 'c31', type: 'chem', q: '水素の化学式は？', choices: ['H₂', 'H', 'He', 'OH'], ans: 'H₂', exp: '水素原子(H)が2つ結びついて分子を作っています。' },
+    { id: 'c32', type: 'chem', q: '酸素の化学式は？', choices: ['O₂', 'O', 'Ox', 'CO₂'], ans: 'O₂', exp: '酸素原子(O)が2つ結びついて分子を作っています。' },
+    { id: 'c33', type: 'chem', q: '水の化学式は？', choices: ['H₂O', 'HO', 'H₂O₂', 'OH'], ans: 'H₂O', exp: '水素原子2つと酸素原子1つでできています。' },
+    { id: 'c34', type: 'chem', q: 'アンモニアの化学式は？', choices: ['NH₃', 'NH₄', 'N₂H', 'NO₂'], ans: 'NH₃', exp: '刺激臭のある気体です。水に非常によく溶けます。' },
+    { id: 'c35', type: 'chem', q: 'メタンの化学式は？', choices: ['CH₄', 'CH₂', 'C₂H', 'CO₂'], ans: 'CH₄', exp: '天然ガスの主成分で、有機物です。' },
+    { id: 'c36', type: 'chem', q: '二酸化炭素の化学式は？', choices: ['CO₂', 'CO', 'C₂O', 'O₂C'], ans: 'CO₂', exp: '炭素原子1つと酸素原子2つでできています。' },
+    { id: 'c37', type: 'chem', q: '酸化銅の化学式は？', choices: ['CuO', 'Cu₂O', 'CuO₂', 'CuCO₃'], ans: 'CuO', exp: '黒色の物質です。銅原子と酸素原子が1:1で結びついています。' },
+    { id: 'c38', type: 'chem', q: '酸化マグネシウムの化学式は？', choices: ['MgO', 'Mg₂O', 'MgO₂', 'Mg₂O₂'], ans: 'MgO', exp: 'マグネシウムを燃焼させるとできる白色の物質です。' },
+    { id: 'c39', type: 'chem', q: '酸化銀の化学式は？', choices: ['Ag₂O', 'AgO', 'AgO₂', 'Ag₂O₃'], ans: 'Ag₂O', exp: '黒色の物質で、加熱すると銀と酸素に分解します。' },
+    { id: 'c40', type: 'chem', q: '塩化銅の化学式は？', choices: ['CuCl₂', 'CuCl', 'Cu₂Cl', 'ClCu'], ans: 'CuCl₂', exp: '銅原子1つと塩素原子2つでできています。' },
+    { id: 'c41', type: 'chem', q: '炭酸水素ナトリウムの化学式は？', choices: ['NaHCO₃', 'Na₂CO₃', 'NaH', 'NaCO₃'], ans: 'NaHCO₃', exp: '重曹とも呼ばれます。熱分解すると炭酸ナトリウムになります。' },
+    { id: 'c42', type: 'chem', q: '炭酸ナトリウムの化学式は？', choices: ['Na₂CO₃', 'NaHCO₃', 'NaCO₃', 'Na₃CO₂'], ans: 'Na₂CO₃', exp: '炭酸水素ナトリウムの熱分解などで生成されます。' },
+    { id: 'c43', type: 'chem', q: '硫酸の化学式は？', choices: ['H₂SO₄', 'HSO₄', 'H₂S', 'HCl'], ans: 'H₂SO₄', exp: '強い酸性を示します。' },
+    { id: 'c44', type: 'chem', q: '水酸化ナトリウムの化学式は？', choices: ['NaOH', 'NaOH₂', 'Na₂OH', 'Na(OH)₂'], ans: 'NaOH', exp: '強いアルカリ性を示します。' },
+    { id: 'c45', type: 'chem', q: '水酸化バリウムの化学式は？', choices: ['Ba(OH)₂', 'BaOH', 'Ba₂OH', 'BaOH₂'], ans: 'Ba(OH)₂', exp: 'バリウムイオン(Ba²⁺)と水酸化物イオン(OH⁻)が1:2で結合しています。' },
+    { id: 'c46', type: 'chem', q: '塩化ナトリウムの化学式は？', choices: ['NaCl', 'NaCl₂', 'Na₂Cl', 'ClNa'], ans: 'NaCl', exp: '食塩の主成分です。' },
+    { id: 'c47', type: 'chem', q: '炭酸カルシウムの化学式は？', choices: ['CaCO₃', 'Ca₂CO₃', 'Ca(CO₃)₂', 'CaO'], ans: 'CaCO₃', exp: '石灰石や貝殻の主成分です。' },
+    { id: 'c48', type: 'chem', q: '硫酸バリウムの化学式は？', choices: ['BaSO₄', 'Ba₂SO₄', 'Ba(SO₄)₂', 'BaS'], ans: 'BaSO₄', exp: '水に溶けにくい白い沈殿となります。' },
+    { id: 'c49', type: 'chem', q: '硫化鉄の化学式は？', choices: ['FeS', 'FeS₂', 'Fe₂S', 'Fe₂S₃'], ans: 'FeS', exp: '鉄と硫黄の混合物を加熱するとできます。' },
+    { id: 'c50', type: 'chem', q: '塩化水素の化学式は？', choices: ['HCl', 'H₂Cl', 'HCl₂', 'ClH'], ans: 'HCl', exp: '水に溶けると塩酸になります。' },
+    { id: 'c51', type: 'chem', q: '塩酸の電離を表す式は？', choices: ['HCl → H⁺ + Cl⁻', 'HCl → H + Cl', 'HCl → H⁻ + Cl⁺', 'HCl → H₂ + Cl₂'], ans: 'HCl → H⁺ + Cl⁻', exp: '水素イオンと塩化物イオンに電離します。' },
+    { id: 'c52', type: 'chem', q: '塩化ナトリウム水溶液の電離を表す式は？', choices: ['NaCl → Na⁺ + Cl⁻', 'NaCl → Na + Cl', 'NaCl → Na⁻ + Cl⁺', 'NaCl → Na²⁺ + Cl²⁻'], ans: 'NaCl → Na⁺ + Cl⁻', exp: 'ナトリウムイオンと塩化物イオンに電離します。' },
+    { id: 'c53', type: 'chem', q: '塩化銅水溶液の電離を表す式は？', choices: ['CuCl₂ → Cu²⁺ + 2Cl⁻', 'CuCl₂ → Cu⁺ + Cl₂⁻', 'CuCl → Cu⁺ + Cl⁻', 'CuCl₂ → Cu + Cl₂'], ans: 'CuCl₂ → Cu²⁺ + 2Cl⁻', exp: '銅イオン(Cu²⁺)と塩化物イオン(Cl⁻)に電離します。係数に注意！' },
+    { id: 'c54', type: 'chem', q: '水酸化ナトリウム水溶液の電離を表す式は？', choices: ['NaOH → Na⁺ + OH⁻', 'NaOH → Na + OH', 'NaOH → Na⁺ + O²⁻ + H⁺', 'NaOH → N⁺ + aOH⁻'], ans: 'NaOH → Na⁺ + OH⁻', exp: 'ナトリウムイオンと水酸化物イオンに電離します。' },
+    { id: 'c55', type: 'chem', q: '塩酸の電気分解の化学反応式は？', choices: ['2HCl → H₂ + Cl₂', 'HCl → H + Cl', 'HCl → H₂ + Cl₂', '2HCl → 2H + 2Cl'], ans: '2HCl → H₂ + Cl₂', exp: '水素と塩素が発生します。' },
+    { id: 'c56', type: 'chem', q: '塩化銅水溶液の電気分解の化学反応式は？', choices: ['CuCl₂ → Cu + Cl₂', 'CuCl₂ → Cu + 2Cl', '2CuCl → 2Cu + Cl₂', 'CuCl → Cu + Cl'], ans: 'CuCl₂ → Cu + Cl₂', exp: '銅と塩素が発生します。' },
+    { id: 'c57', type: 'chem', q: '銅の酸化の化学反応式は？', choices: ['2Cu + O₂ → 2CuO', 'Cu + O → CuO', 'Cu + O₂ → CuO₂', '2Cu + O → Cu₂O'], ans: '2Cu + O₂ → 2CuO', exp: '銅原子と酸素分子が反応して酸化銅になります。' },
+    { id: 'c58', type: 'chem', q: '酸化銅を炭素で還元したときの化学反応式は？', choices: ['2CuO + C → 2Cu + CO₂', 'CuO + C → Cu + CO', '2CuO + C → Cu₂ + CO₂', 'CuO + C → Cu + C'], ans: '2CuO + C → 2Cu + CO₂', exp: '酸化銅から酸素が奪われ、炭素と結びついて二酸化炭素になります。' },
+    { id: 'c59', type: 'chem', q: '酸化銅を水素で還元したときの化学反応式は？', choices: ['CuO + H₂ → Cu + H₂O', '2CuO + H₂ → 2Cu + H₂O₂', 'CuO + H → Cu + OH', 'CuO + 2H → Cu + H₂O'], ans: 'CuO + H₂ → Cu + H₂O', exp: '水が発生します。' },
+    { id: 'c60', type: 'chem', q: '酸化銀の熱分解の化学反応式は？', choices: ['2Ag₂O → 4Ag + O₂', 'Ag₂O → 2Ag + O', '2AgO → 2Ag + O₂', 'AgO → Ag + O'], ans: '2Ag₂O → 4Ag + O₂', exp: '銀と酸素に分解されます。' },
+    { id: 'c61', type: 'chem', q: '水の電気分解の化学反応式は？', choices: ['2H₂O → 2H₂ + O₂', 'H₂O → H₂ + O', '2H₂O → 2H₂ + 2O', 'H₂O → H + OH'], ans: '2H₂O → 2H₂ + O₂', exp: '水素と酸素が発生します。体積比は2:1です。' },
+    { id: 'c62', type: 'chem', q: '炭酸水素ナトリウムの熱分解の化学反応式は？', choices: ['2NaHCO₃ → Na₂CO₃ + H₂O + CO₂', 'NaHCO₃ → NaCO₃ + H + O', '2NaHCO₃ → Na₂CO₃ + H₂ + O₂', 'NaHCO₃ → Na + H + C + O₃'], ans: '2NaHCO₃ → Na₂CO₃ + H₂O + CO₂', exp: '炭酸ナトリウム、水、二酸化炭素の3つに分解されます。' },
+    { id: 'c63', type: 'chem', q: '硫酸イオンのイオン式は？', choices: ['SO₄²⁻', 'SO₄⁻', 'S²⁻', 'SO₃²⁻'], ans: 'SO₄²⁻', exp: '2価の陰イオンです。' },
+    { id: 'c64', type: 'chem', q: '炭酸イオンのイオン式は？', choices: ['CO₃²⁻', 'CO₃⁻', 'C⁴⁺', 'CO₂'], ans: 'CO₃²⁻', exp: '2価の陰イオンです。' },
+    { id: 'c65', type: 'chem', q: 'アンモニウムイオンのイオン式は？', choices: ['NH₄⁺', 'NH₃⁺', 'NH₄⁻', 'N³⁻'], ans: 'NH₄⁺', exp: '多原子イオンで、1価の陽イオンです。' },
+    { id: 'c66', type: 'chem', q: '水酸化物イオンのイオン式は？', choices: ['OH⁻', 'OH⁺', 'O²⁻', 'H⁺'], ans: 'OH⁻', exp: 'アルカリ性を示す原因となるイオンです。' },
+    { id: 'c67', type: 'chem', q: '銅イオンのイオン式は？', choices: ['Cu²⁺', 'Cu⁺', 'Cu³⁺', 'Cu⁻'], ans: 'Cu²⁺', exp: '水溶液中では青色を示します。' },
+    { id: 'c68', type: 'chem', q: '銀イオンのイオン式は？', choices: ['Ag⁺', 'Ag²⁺', 'Ag⁻', 'Ag³⁺'], ans: 'Ag⁺', exp: '1価の陽イオンです。' },
+    { id: 'c69', type: 'chem', q: 'マグネシウムイオンのイオン式は？', choices: ['Mg²⁺', 'Mg⁺', 'Mg³⁺', 'Mg⁻'], ans: 'Mg²⁺', exp: '2価の陽イオンです。' },
+    { id: 'c70', type: 'chem', q: 'アルミニウムイオンのイオン式は？', choices: ['Al³⁺', 'Al²⁺', 'Al⁺', 'Al⁴⁺'], ans: 'Al³⁺', exp: '3価の陽イオンです。' },
+    { id: 'c71', type: 'chem', q: '水素イオンのイオン式は？', choices: ['H⁺', 'H⁻', 'H²⁺', 'OH⁻'], ans: 'H⁺', exp: '酸性を示す原因となるイオンです。' },
+    { id: 'c72', type: 'chem', q: '硫酸銅水溶液の電離を表す式は？', choices: ['CuSO₄ → Cu²⁺ + SO₄²⁻', 'CuSO₄ → Cu⁺ + SO₄⁻', 'CuSO₄ → Cu + S + 4O', 'CuSO₄ → Cu²⁺ + S²⁻ + 4O²⁻'], ans: 'CuSO₄ → Cu²⁺ + SO₄²⁻', exp: '銅イオン(Cu²⁺)と硫酸イオン(SO₄²⁻)に電離します。' },
+
+    // --- 生物 (Biology) ---
+    { id: 'b1', type: 'bio', q: 'だ液に含まれる消化酵素は？', choices: ['アミラーゼ', 'ペプシン', 'リパーゼ', 'トリプシン'], ans: 'アミラーゼ', exp: 'デンプンを麦芽糖などに分解します。' },
+    { id: 'b2', type: 'bio', q: '脂肪を分解する消化酵素は？', choices: ['リパーゼ', 'アミラーゼ', 'ペプシン', 'トリプシン'], ans: 'リパーゼ', exp: 'すい液に含まれています。脂肪を脂肪酸とモノグリセリドに分解します。' },
+    { id: 'b3', type: 'bio', q: '胃液に含まれる消化酵素は？', choices: ['ペプシン', 'トリプシン', 'アミラーゼ', 'リパーゼ'], ans: 'ペプシン', exp: 'タンパク質を分解します。酸性でよく働きます。' },
+    { id: 'b4', type: 'bio', q: 'すい液に含まれ、タンパク質を分解する酵素は？', choices: ['トリプシン', 'ペプシン', 'アミラーゼ', 'リパーゼ'], ans: 'トリプシン', exp: 'すい液は３大栄養素すべての消化酵素を含んでいます。' },
+    { id: 'b5', type: 'bio', q: '小腸で吸収されたブドウ糖やアミノ酸が肝臓へ送られる血管は？', choices: ['門脈', '大静脈', '肝動脈', '大動脈'], ans: '門脈', exp: '小腸と肝臓をつなぐ特別な静脈です。' },
+    { id: 'b6', type: 'bio', q: '植物の道管が運ぶものは？', choices: ['根から吸い上げられた水や水に溶けた養分', '葉で作られた養分', '酸素', '二酸化炭素'], ans: '根から吸い上げられた水や水に溶けた養分', exp: '師管は葉で作られた養分を運びます。' },
+    { id: 'b7', type: 'bio', q: '植物の師管が運ぶものは？', choices: ['葉で作られた養分', '根から吸い上げられた水', '酸素', '土壌の微生物'], ans: '葉で作られた養分', exp: '光合成で作られたデンプンなどが水に溶けやすい物質に変わって運ばれます。' },
+    { id: 'b8', type: 'bio', q: '形や働きの同じ細胞が集まったものを何という？', choices: ['組織', '器官', '個体', '細胞壁'], ans: '組織', exp: '例：筋組織、表皮組織など。' },
+    { id: 'b9', type: 'bio', q: '組織が集まって特定の働きをするようになったものを何という？', choices: ['器官', '組織系', '細胞', '個体'], ans: '器官', exp: '例：胃、心臓、葉、根など。' },
+    { id: 'b10', type: 'bio', q: '単子葉類の茎の維管束はどのように分布している？', choices: ['茎全体に散らばっている', '輪状に並んでいる', '中心に集まっている', 'ない'], ans: '茎全体に散らばっている', exp: '双子葉類は輪状に並んでいます。' },
+    { id: 'b11', type: 'bio', q: '根の先端近くにある細かい毛状のものは？', choices: ['根毛', '柔毛', '繊毛', '主根'], ans: '根毛', exp: '表面積を広げて水や養分を効率よく吸収します。' },
+    { id: 'b12', type: 'bio', q: '単子葉類の根のつくりは？', choices: ['ひげ根', '主根と側根', '塊根', '直根'], ans: 'ひげ根', exp: '双子葉類は主根と側根からなります。' },
+    { id: 'b13', type: 'bio', q: '顕微鏡で光の量を調節する部分は？', choices: ['しぼりと反射鏡', '対物レンズ', '接眼レンズ', '調節ねじ'], ans: 'しぼりと反射鏡', exp: '視野の明るさを調整するために使います。' },
+    { id: 'b14', type: 'bio', q: '顕微鏡の倍率を高くすると、視野の明るさと見える範囲はどうなる？', choices: ['視野：暗くなる、見える範囲：せまくなる', '視野：明るくなる、見える範囲：広くなる', '視野：暗くなる、見える範囲：広くなる', '視野：変わらない、見える範囲：せまくなる'], ans: '視野：暗くなる、見える範囲：せまくなる', exp: '倍率を上げると光が入る量が減るため暗くなります。' },
+    { id: 'b15', type: 'bio', q: '光合成の材料となる物質は？', choices: ['二酸化炭素と水', '酸素と水', '二酸化炭素とデンプン', '酸素とデンプン'], ans: '二酸化炭素と水', exp: '光エネルギーを使ってデンプンと酸素を作ります。' },
+    { id: 'b16', type: 'bio', q: '日中の植物の呼吸と光合成の関係は？', choices: ['呼吸と光合成の両方を行っているが、呼吸より光合成のほうがさかん', '呼吸のみ行っている', '光合成のみ行っている', '呼吸より光合成のほうが少ない'], ans: '呼吸と光合成の両方を行っているが、呼吸より光合成のほうがさかん', exp: 'そのため、全体としては二酸化炭素を吸収し酸素を放出しているように見えます。' },
+    { id: 'b17', type: 'bio', q: 'BTB溶液に息を吹き込んだ後、オオカナダモを入れて光を当てると青色になった理由は？', choices: ['光合成によって二酸化炭素が使われたから', '呼吸によって二酸化炭素が出されたから', '酸素が使われたから', '水が蒸発したから'], ans: '光合成によって二酸化炭素が使われたから', exp: '二酸化炭素が減るとアルカリ性になり、BTB溶液は青色になります。' },
+    { id: 'b18', type: 'bio', q: '光合成で作られる最初の養分は？', choices: ['ブドウ糖', 'アミノ酸', '脂肪', 'ビタミン'], ans: 'ブドウ糖', exp: 'すぐにデンプンに変えられて一時的に葉に蓄えられます。' },
+    { id: 'b19', type: 'bio', q: '胆汁はどこで作られ、どこにためられる？', choices: ['肝臓で作られ、胆のうにためられる', '胆のうで作られ、肝臓にためられる', 'すい臓で作られ、胆のうにためられる', '胃で作られ、小腸にためられる'], ans: '肝臓で作られ、胆のうにためられる', exp: '胆汁は消化酵素を含みません。' },
+    { id: 'b20', type: 'bio', q: 'タンパク質は最終的に何に分解される？', choices: ['アミノ酸', 'ブドウ糖', '脂肪酸', 'グリコーゲン'], ans: 'アミノ酸', exp: 'アミノ酸は小腸で吸収された後、体内で再びタンパク質に合成されます。' },
+    { id: 'b21', type: 'bio', q: '脂肪は最終的に何に分解される？', choices: ['脂肪酸とモノグリセリド', 'アミノ酸とブドウ糖', 'グリコーゲン', '脂肪酸とアミノ酸'], ans: '脂肪酸とモノグリセリド', exp: '吸収された後、柔毛内で再び脂肪に戻りリンパ管に入ります。' },
+    { id: 'b22', type: 'bio', q: '３大栄養素（炭水化物・タンパク質・脂肪）すべての消化酵素を含む消化液は？', choices: ['すい液', '胃液', '胆汁', 'だ液'], ans: 'すい液', exp: '消化の要となる非常に重要な消化液です。' },
+    { id: 'b23', type: 'bio', q: '肝臓でブドウ糖は何という物質に変えられて貯蔵される？', choices: ['グリコーゲン', 'デンプン', '脂肪', 'タンパク質'], ans: 'グリコーゲン', exp: '必要に応じて再びブドウ糖に戻され血液中に放出されます。' },
+    { id: 'b24', type: 'bio', q: '柔毛の内部にあり、ブドウ糖やアミノ酸を吸収する血管は？', choices: ['毛細血管', 'リンパ管', '動脈', '静脈'], ans: '毛細血管', exp: '水溶性の養分は毛細血管に入り、門脈を通って肝臓へ行きます。' },
+    { id: 'b25', type: 'bio', q: '柔毛の内部にあり、脂肪酸とモノグリセリドを吸収する管は？', choices: ['リンパ管', '毛細血管', '胆管', '輸尿管'], ans: 'リンパ管', exp: '脂肪はリンパ管に入り、首の下で静脈と合流します。' },
+    { id: 'b26', type: 'bio', q: '小腸の壁にあるひだの表面にある突起は？', choices: ['柔毛', '根毛', '繊毛', '肺胞'], ans: '柔毛', exp: '表面積を大きくして吸収効率を高めています。' },
+    { id: 'b27', type: 'bio', q: 'デンプンにだ液を加えてヨウ素液が反応しなくなった理由は？', choices: ['麦芽糖などができたこと', 'デンプンが増えたこと', '温度が上がったこと', 'ヨウ素液が古かったこと'], ans: '麦芽糖などができたこと', exp: 'アミラーゼによってデンプンが分解されたためです。' },
+    { id: 'b28', type: 'bio', q: '胆汁の働きは？', choices: ['脂肪の消化を助ける', 'タンパク質を分解する', 'デンプンを分解する', '殺菌作用'], ans: '脂肪の消化を助ける', exp: '脂肪を細かい粒にして、リパーゼが働きやすくします（乳化）。' },
+    { id: 'b29', type: 'bio', q: '気管支の先端にある小さな袋状のつくりは？', choices: ['肺胞', '柔毛', '気嚢', '細胞'], ans: '肺胞', exp: '表面積を広げ、ガス交換の効率を高めています。' },
+    { id: 'b30', type: 'bio', q: '細胞が酸素を使って栄養分を分解しエネルギーを取り出す働きは？', choices: ['細胞の呼吸', '外呼吸', '消化', '循環'], ans: '細胞の呼吸', exp: 'この時、二酸化炭素と水が排出されます。' },
+    { id: 'b31', type: 'bio', q: '赤血球に含まれる赤い色素は？', choices: ['ヘモグロビン', 'カロテン', 'クロロフィル', 'メラニン'], ans: 'ヘモグロビン', exp: '酸素と結びつく性質を持ちます。' },
+    { id: 'b32', type: 'bio', q: '血液成分のうち、血液を凝固させる働きがあるのは？', choices: ['血小板', '赤血球', '白血球', '血しょう'], ans: '血小板', exp: '出血した時に傷口をふさぎます。' },
+    { id: 'b33', type: 'bio', q: '血液の液体成分で、栄養分や不要物を運ぶのは？', choices: ['血しょう', '組織液', 'リンパ液', '血小板'], ans: '血しょう', exp: '毛細血管からしみ出すと組織液になります。' },
+    { id: 'b34', type: 'bio', q: '肺呼吸に関係する筋肉の膜は？', choices: ['横隔膜', '腹筋', '心筋', '肋間筋'], ans: '横隔膜', exp: '横隔膜が上下することで胸腔の広さが変わり、肺に空気を出し入れします。' },
+    { id: 'b35', type: 'bio', q: '毛細血管からしみ出して細胞の間を満たしている液体は？', choices: ['組織液', 'リンパ液', '血しょう', '細胞質'], ans: '組織液', exp: '細胞との間で物質交換を行います。' },
+    { id: 'b36', type: 'bio', q: '心臓から送り出される血液が流れる血管は？', choices: ['動脈', '静脈', '毛細血管', 'リンパ管'], ans: '動脈', exp: '壁が厚く弾力性があり、血液が高い圧力で流れます。' },
+    { id: 'b37', type: 'bio', q: '酸素を多く含む血液を何という？', choices: ['動脈血', '静脈血', '多血', '貧血'], ans: '動脈血', exp: '鮮やかな赤色をしています。' },
+    { id: 'b38', type: 'bio', q: '心臓の部屋で、全身へ血液を送り出すため壁が最も厚いのは？', choices: ['左心室', '右心室', '左心房', '右心房'], ans: '左心室', exp: '強い圧力で大動脈へ血液を押し出します。' },
+    { id: 'b39', type: 'bio', q: '全身から戻ってきた血液が入る心臓の部屋は？', choices: ['右心房', '左心房', '右心室', '左心室'], ans: '右心房', exp: '大静脈から戻ってきます。' },
+    { id: 'b40', type: 'bio', q: '肺から心臓に戻る血管は？', choices: ['肺静脈', '肺動脈', '大静脈', '大動脈'], ans: '肺静脈', exp: '動脈血が流れていますが、心臓に戻るので「静脈」という名前です。' },
+    { id: 'b41', type: 'bio', q: '左心室から全身へ向かう血管は？', choices: ['大動脈', '肺動脈', '大静脈', '肺静脈'], ans: '大動脈', exp: '体の中で最も太い動脈です。' },
+    { id: 'b42', type: 'bio', q: '心臓→全身→心臓という血液の流れを何という？', choices: ['体循環', '肺循環', 'リンパ循環', '大循環'], ans: '体循環', exp: '心臓→肺→心臓の流れは肺循環です。' },
+    { id: 'b43', type: 'bio', q: '肝臓でアンモニアから作られる無害な物質は？', choices: ['尿素', '尿酸', '塩分', 'タンパク質'], ans: '尿素', exp: '尿素は腎臓でこし出されて尿となります。' },
+    { id: 'b44', type: 'bio', q: '腎臓で作られた尿をぼうこうへ運ぶ管は？', choices: ['輸尿管', '尿道', '胆管', 'リンパ管'], ans: '輸尿管', exp: '腎臓とぼうこうをつないでいます。' },
+    { id: 'b45', type: 'bio', q: '肝臓の働きのひとつで、有害な物質を無害にする働きは？', choices: ['アンモニアを尿素に変える', 'アルコールを作る', '胆汁を吸収する', '尿を作る'], ans: 'アンモニアを尿素に変える', exp: '解毒作用の一つです。' },
+    { id: 'b46', type: 'bio', q: '目に入る光の量を調節する部分は？', choices: ['虹彩', '網膜', '水晶体', '角膜'], ans: '虹彩', exp: '瞳（ひとみ）の大きさを変えて調節します。' },
+    { id: 'b47', type: 'bio', q: '目のつくりで、像が結ばれるスクリーンとなる部分は？', choices: ['網膜', '角膜', '虹彩', '視神経'], ans: '網膜', exp: '光の刺激を受け取る細胞が集まっています。' },
+    { id: 'b48', type: 'bio', q: '鼓膜の振動を増幅してうずまき管に伝える骨は？', choices: ['耳小骨', '頭蓋骨', '鎖骨', '軟骨'], ans: '耳小骨', exp: '人体で最も小さい骨です。' },
+    { id: 'b49', type: 'bio', q: '耳の奥にあり、音の振動を刺激として受け取る部分は？', choices: ['うずまき管', '半規管', '前庭', '耳小骨'], ans: 'うずまき管', exp: '内部は液体で満たされています。' },
+    { id: 'b50', type: 'bio', q: '音の振動を受け止める膜は？', choices: ['鼓膜', '網膜', '角膜', '粘膜'], ans: '鼓膜', exp: '空気の振動を捉えます。' },
+    { id: 'b51', type: 'bio', q: '目のつくりで、レンズの役割をするのは？', choices: ['水晶体', '硝子体', '角膜', '毛様体'], ans: '水晶体', exp: '厚さを変えてピントを合わせます。' },
+    { id: 'b52', type: 'bio', q: '脳と脊髄を合わせて何という？', choices: ['中枢神経', '末梢神経', '感覚神経', '自律神経'], ans: '中枢神経', exp: '全身の神経の指令塔です。' },
+    { id: 'b53', type: 'bio', q: '刺激に対して無意識に起こる反応は？', choices: ['反射', '随意運動', '習性', '学習'], ans: '反射', exp: '危険から身を守るために役立ちます。' },
+    { id: 'b54', type: 'bio', q: '体が成長する時などに行われる細胞分裂は？', choices: ['体細胞分裂', '減数分裂', '生殖分裂', '核分裂'], ans: '体細胞分裂', exp: '染色体数は変わりません。' },
+    { id: 'b55', type: 'bio', q: '核の中にあり、遺伝情報を持つものは？', choices: ['染色体', 'リボソーム', 'ミトコンドリア', 'ゴルジ体'], ans: '染色体', exp: '細胞分裂の時に太く短くなり観察できるようになります。' },
+    { id: 'b56', type: 'bio', q: '染色体の本体である物質は？', choices: ['DNA', 'RNA', 'タンパク質', '脂質'], ans: 'DNA', exp: 'デオキシリボ核酸の略です。' },
+    { id: 'b57', type: 'bio', q: '細胞分裂において、染色体はいつ複製されるか？', choices: ['分裂が始まる前', '分裂の中期', '分裂の後期', '分裂が終わった後'], ans: '分裂が始まる前', exp: '複製されてから分裂することで、同じ遺伝情報を受け継げます。' },
+    { id: 'b58', type: 'bio', q: '形質を表すもとになるものを何という？', choices: ['遺伝子', '染色体', 'DNA', '核'], ans: '遺伝子', exp: 'DNA上の特定の配列が遺伝子として働きます。' },
+    { id: 'b59', type: 'bio', q: '子孫を残すための特別な細胞（精子や卵）を何という？', choices: ['生殖細胞', '体細胞', '免疫細胞', '幹細胞'], ans: '生殖細胞', exp: '減数分裂によって作られます。' },
+    { id: 'b60', type: 'bio', q: '精子の核と卵の核が合体することを何という？', choices: ['受精', '受粉', '分裂', '発生'], ans: '受精', exp: '受精卵となります。' },
+    { id: 'b61', type: 'bio', q: '受精を行わずに子をつくる生殖方法は？', choices: ['無性生殖', '有性生殖', '胎生', '卵生'], ans: '無性生殖', exp: '分裂や出芽などがあります。' },
+    { id: 'b62', type: 'bio', q: '植物の体の一部から新しい個体ができる無性生殖は？', choices: ['栄養生殖', '分裂', '出芽', '胞子生殖'], ans: '栄養生殖', exp: 'ジャガイモのいもや、オランダイチゴのほふく茎など。' },
+    { id: 'b63', type: 'bio', q: '無性生殖でできた、親と全く同じ遺伝子を持つ個体を何という？', choices: ['クローン', 'ハイブリッド', 'ミュータント', 'キメラ'], ans: 'クローン', exp: '遺伝的に同一です。' },
+    { id: 'b64', type: 'bio', q: '受精卵が細胞分裂を繰り返し、成体になるまでの過程は？', choices: ['発生', '変態', '進化', '成長'], ans: '発生', exp: '複雑な体のつくりが形成されていきます。' },
+    { id: 'b65', type: 'bio', q: '受精卵が分裂を始めてから、自分で食物をとるようになるまでの個体は？', choices: ['胚', '胎児', '幼生', '成体'], ans: '胚', exp: '植物の場合は種子の中にあります。' },
+    { id: 'b66', type: 'bio', q: '生殖細胞ができるときに行われる、染色体数が半分になる分裂は？', choices: ['減数分裂', '体細胞分裂', '倍数分裂', '無糸分裂'], ans: '減数分裂', exp: '受精によって元の数に戻るために必要です。' },
+    { id: 'b67', type: 'bio', q: '減数分裂はいつ行われるか？', choices: ['生殖細胞ができるとき', '受精するとき', '体が成長するとき', '怪我が治るとき'], ans: '生殖細胞ができるとき', exp: '精巣や卵巣で行われます。' },
+    { id: 'b68', type: 'bio', q: '生物が持つ形や性質の特徴を何という？', choices: ['形質', '遺伝', '進化', '本能'], ans: '形質', exp: '親から子へ伝えられます。' },
+    { id: 'b69', type: 'bio', q: '減数分裂の際、対になっている遺伝子が分かれて別々の生殖細胞に入る法則は？', choices: ['分離の法則', '優性の法則', '独立の法則', 'メンデルの法則'], ans: '分離の法則', exp: 'メンデルが発見しました。' },
+    { id: 'b70', type: 'bio', q: '自家受粉を繰り返しても、代々同じ形質が現れる系統を何という？', choices: ['純系', '雑種', '変種', '亜種'], ans: '純系', exp: '遺伝子の組み合わせがホモ接合（AAやaa）になっています。' },
+    { id: 'b71', type: 'bio', q: '丸としわのように、同時には現れない対になる形質を何という？', choices: ['対立形質', '優性形質', '劣性形質', '中間形質'], ans: '対立形質', exp: 'どちらか一方の形質が現れます。' },
+    { id: 'b72', type: 'bio', q: '対立形質を持つ純系同士をかけた時、子に現れる形質は？', choices: ['顕性形質', '潜性形質', '中性形質', '混合形質'], ans: '顕性形質', exp: '以前は優性形質と呼ばれていました。' },
+    { id: 'b73', type: 'bio', q: '対立形質を持つ純系同士をかけた時、子に現れない形質は？', choices: ['潜性形質', '顕性形質', '劣性形質', '陰性形質'], ans: '潜性形質', exp: '遺伝子は持っていますが、形質としては現れません。' },
+    { id: 'b74', type: 'bio', q: '顕性形質と潜性形質の遺伝子を持つ個体同士をかけた時、子に現れる形質の分離比（顕性：潜性）は？', choices: ['3：1', '1：1', '1：2：1', '9：3：3：1'], ans: '3：1', exp: 'Aa × Aa → AA, Aa, Aa, aa となり、顕性は3、潜性は1の割合になります。' },
+    { id: 'b75', type: 'bio', q: '形や働きは違うが、起源が同じ器官を何という？', choices: ['相同器官', '相似器官', '痕跡器官', '感覚器官'], ans: '相同器官', exp: '進化の証拠となります（例：ヒトの腕と鳥の翼）。' },
+    { id: 'b76', type: 'bio', q: 'ハチュウ類と鳥類の中間の特徴を持つ生物の化石は？', choices: ['始祖鳥', 'アンモナイト', '三葉虫', 'マンモス'], ans: '始祖鳥', exp: '口に歯があり、翼に爪があるなどの特徴があります。' },
+
+    // --- 物理 (Physics) ---
+    { id: 'p1', type: 'phys', q: '音の高さは何によって決まるか？', choices: ['振動数', '振幅', '波形', '速さ'], ans: '振動数', exp: '1秒間の振動回数(Hz)が多いほど高い音になります。' },
+    { id: 'p2', type: 'phys', q: '音の大きさは何によって決まるか？', choices: ['振幅', '振動数', '振動の速さ', '音色'], ans: '振幅', exp: '揺れ幅が大きいほど、大きな音になります。' },
+    { id: 'p3', type: 'phys', q: '光が鏡などで跳ね返る現象を何という？', choices: ['反射', '屈折', '全反射', '分散'], ans: '反射', exp: '入射角と反射角は等しくなります（反射の法則）。' },
+    { id: 'p4', type: 'phys', q: '光が水中から空気中へ進む時、入射角がある角度を超えると全て反射する現象は？', choices: ['全反射', '乱反射', '屈折', '干渉'], ans: '全反射', exp: '光ファイバーなどに利用されています。' },
+    { id: 'p5', type: 'phys', q: '凸レンズを通して、物体と同じ向きに見える像を何という？', choices: ['虚像', '実像', '倒立像', '鏡像'], ans: '虚像', exp: '虫眼鏡で拡大して見る時などがこれにあたります。実像は上下左右逆（倒立）です。' },
+    { id: 'p6', type: 'phys', q: '音が空気中を伝わる速さは、およそ毎秒何メートル？', choices: ['約340m', '約3400m', '約30万km', '約1500m'], ans: '約340m', exp: '光の速さ（約30万km/s）に比べて非常に遅いです。' },
+    { id: 'p7', type: 'phys', q: 'ばねののびは、ばねを引く力に比例するという法則は？', choices: ['フックの法則', 'オームの法則', 'ジュールの法則', '慣性の法則'], ans: 'フックの法則', exp: '力と変形の関係を示す基本法則です。' },
+    { id: 'p8', type: 'phys', q: '圧力の単位「Pa」の読み方は？', choices: ['パスカル', 'ニュートン', 'ジュール', 'ワット'], ans: 'パスカル', exp: '1Pa = 1N/m² です。' },
+    { id: 'p9', type: 'phys', q: '水中の物体が、水から受ける上向きの力を何という？', choices: ['浮力', '重力', '抗力', '弾性力'], ans: '浮力', exp: 'アルキメデスの原理に関係します。深さに関係なく、押しのけた水の重さと等しくなります。' },
+    { id: 'p10', type: 'phys', q: '回路を流れる電流の強さは電圧に比例し、抵抗に反比例するという法則は？', choices: ['オームの法則', 'フックの法則', 'ジュールの法則', '右ねじの法則'], ans: 'オームの法則', exp: 'V = RI （電圧＝抵抗×電流）の式で表されます。' },
+    { id: 'p11', type: 'phys', q: '電気抵抗が小さく、電流が流れやすい物質を何という？', choices: ['導体', '不導体', '絶縁体', '半導体'], ans: '導体', exp: '金属などが代表的です。流れにくいものは絶縁体（不導体）です。' },
+    { id: 'p12', type: 'phys', q: '1秒間あたりに使われる電気エネルギーの量を表す値は？', choices: ['電力', '電力量', '電圧', '熱量'], ans: '電力', exp: '単位はワット(W)です。電力＝電圧×電流 で求められます。' },
+    { id: 'p13', type: 'phys', q: '電流が磁界から受ける力を利用して回転する装置は？', choices: ['モーター', '発電機', '変圧器', '電磁石'], ans: 'モーター', exp: 'フレミングの左手の法則が働いています。' },
+    { id: 'p14', type: 'phys', q: 'コイルの中の磁界が変化すると、コイルに電圧が生じる現象は？', choices: ['電磁誘導', '静電誘導', '誘電分極', '放電'], ans: '電磁誘導', exp: 'この時流れる電流を誘導電流といいます。発電機の原理です。' },
+    { id: 'p15', type: 'phys', q: '家庭のコンセントのように、電流の向きと大きさが周期的に変わる電気は？', choices: ['交流', '直流', '整流', '過電流'], ans: '交流', exp: '東日本は50Hz、西日本は60Hzです。電池は直流です。' },
+    { id: 'p16', type: 'phys', q: '物体がその運動の状態を続けようとする性質を何という？', choices: ['慣性', '惰性', '弾性', '剛性'], ans: '慣性', exp: '急ブレーキで体が前にのめるのはこのためです。' },
+    { id: 'p17', type: 'phys', q: '物体に力を加えて、その向きに動かしたとき、力×距離で表される量は？', choices: ['作用・反作用の法則', '慣性の法則', '力のつり合い', '運動の法則'], ans: '作用・反作用の法則', exp: '壁を押すと、壁からも押し返されています。' },
+    { id: 'p18', type: 'phys', q: '速さが一定で一直線上を進む運動を何という？', choices: ['等速直線運動', '等加速度運動', '自由落下', '単振動'], ans: '等速直線運動', exp: '力が働いていないか、力がつり合っている時の運動です。' },
+    { id: 'p19', type: 'phys', q: '運動している物体が持っているエネルギーは？', choices: ['運動エネルギー', '位置エネルギー', '弾性エネルギー', '熱エネルギー'], ans: '運動エネルギー', exp: '質量が大きいほど、また速さが速いほど大きくなります。' },
+    { id: 'p20', type: 'phys', q: '高い所にある物体が持っているエネルギーは？', choices: ['位置エネルギー', '運動エネルギー', '化学エネルギー', '核エネルギー'], ans: '位置エネルギー', exp: '質量が大きいほど、また高さが高いほど大きくなります。' },
+    { id: 'p21', type: 'phys', q: '位置エネルギーと運動エネルギーの和が一定に保たれることを何という？', choices: ['力学的エネルギー保存の法則', 'エネルギー不滅の法則', '質量保存の法則', '慣性の法則'], ans: '力学的エネルギー保存の法則', exp: '摩擦や空気抵抗がない場合になりたちます。' },
+    { id: 'p22', type: 'phys', q: '物体に力を加えて、その向きに動かしたとき、力×距離で表される量は？', choices: ['仕事', '仕事率', 'エネルギー', '負荷'], ans: '仕事', exp: '単位はジュール(J)です。動かない場合は仕事は0です。' },
+    { id: 'p23', type: 'phys', q: '1秒間あたりの仕事の大きさを何という？', choices: ['仕事率', '能率', '効率', '馬力'], ans: '仕事率', exp: '単位はワット(W)です。仕事率＝仕事÷時間 で求められます。' },
+    { id: 'p24', type: 'phys', q: '温度の異なる物質が接した時、高温側から低温側へ熱が移動する現象は？', choices: ['熱伝導', '対流', '放射', '拡散'], ans: '熱伝導', exp: '固体中などを熱が伝わる現象です。' },
+    { id: 'p25', type: 'phys', q: '液体や気体が移動して熱を運ぶ現象は？', choices: ['対流', '伝導', '放射', '蒸発'], ans: '対流', exp: 'エアコンや風呂の湯が温まるのはこれです。' },
+    { id: 'p26', type: 'phys', q: '熱が電磁波として空間を伝わる現象は？', choices: ['放射', '伝導', '対流', '発散'], ans: '放射', exp: '太陽の熱が地球に届くのは放射（熱放射）によるものです。' },
+    { id: 'p27', type: 'phys', q: '斜面上の台車の運動で、時間とともに速さがどう変化するか？', choices: ['一定の割合で速くなる', '変化しない', '急激に速くなる', '一定の割合で遅くなる'], ans: '一定の割合で速くなる', exp: '等加速度運動をします。' },
+    { id: 'p28', type: 'phys', q: '異なる種類の物質をこすり合わせると生じる電気は？', choices: ['静電気', '動電気', '圧電', '熱電'], ans: '静電気', exp: '電子の移動によって生じます。' },
+    { id: 'p29', type: 'phys', q: '電流が流れる道筋が1本の輪になっている回路は？', choices: ['直列回路', '並列回路', '短絡回路', '閉回路'], ans: '直列回路', exp: '枝分かれしているのが並列回路です。' },
+    { id: 'p30', type: 'phys', q: '100gの物体に働く重力を1Nとする。500gの物体を2m持ち上げた時の仕事は？', choices: ['10J', '1000J', '5J', '2.5J'], ans: '10J', exp: '力(5N) × 距離(2m) = 10J です。' }
+];
+
+// Audio Engine (Web Audio API)
+const AudioEngine = {
+    ctx: null,
+    
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    },
+
+    playTone(freq, type, duration, startTime = 0) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+        
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime + startTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start(this.ctx.currentTime + startTime);
+        osc.stop(this.ctx.currentTime + startTime + duration);
+    },
+
+    playCorrect() {
+        this.init();
+        this.playTone(880, 'sine', 0.1, 0); // A5
+        this.playTone(1760, 'sine', 0.4, 0.1); // A6
+    },
+
+    playWrong() {
+        this.init();
+        this.playTone(150, 'sawtooth', 0.15, 0);
+        this.playTone(150, 'sawtooth', 0.3, 0.2);
+    },
+    
+    playClick() {
+        this.init();
+        this.playTone(800, 'triangle', 0.05, 0);
+    }
+};
+
+const App = {
+    userData: {
+        mastery: {}, // { id: level }
+        wrongs: [],
+        ranking: [] // Array of {score, mode, date}
+    },
+    currentListTab: 'chem',
+    pendingMode: '', // For settings modal
+
+    init() {
+        document.getElementById('ver-display').innerText = CONFIG.ver;
+        document.title = "中3追試験対策アプリ " + CONFIG.ver;
+        
+        this.loadData();
+        this.renderMenu();
+
+        // Prevent double tap zoom
+        document.addEventListener('dblclick', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+        
+        // Init Audio on user interaction
+        document.body.addEventListener('click', () => AudioEngine.init(), { once: true });
+    },
+
+    loadData() {
+        const d = localStorage.getItem('scienceApp_v3');
+        if (d) {
+            this.userData = JSON.parse(d);
+            if (!this.userData.ranking) this.userData.ranking = [];
+        } else {
+            // Migration from v2 if exists
+            const v2 = localStorage.getItem('scienceApp_v2');
+            if(v2) {
+                this.userData = JSON.parse(v2);
+                this.userData.ranking = [];
+            }
+            // Initialize
+            QUESTIONS.forEach(q => {
+                if(this.userData.mastery[q.id] === undefined) this.userData.mastery[q.id] = 0;
+            });
+        }
+    },
+
+    saveData() {
+        localStorage.setItem('scienceApp_v3', JSON.stringify(this.userData));
+        this.renderMenu();
+    },
+
+    resetData() {
+        if(confirm('本当にリセットしていいですか？')) {
+            localStorage.removeItem('scienceApp_v3');
+            localStorage.removeItem('scienceApp_v2');
+            location.reload();
+        }
+    },
+
+    renderMenu() {
+        const types = ['chem', 'bio', 'phys'];
+        types.forEach(type => {
+            const qs = QUESTIONS.filter(q => q.type === type);
+            const total = qs.length;
+            const mastered = qs.filter(q => (this.userData.mastery[q.id] || 0) >= CONFIG.passScore).length;
+            const percent = total === 0 ? 0 : Math.floor((mastered / total) * 100);
+
+            document.getElementById(`prog-text-${type}`).innerText = `${percent}%`;
+            document.getElementById(`prog-bar-${type}`).style.width = `${percent}%`;
+        });
+
+        const weakCount = QUESTIONS.filter(q => (this.userData.mastery[q.id] || 0) < CONFIG.passScore).length;
+        document.getElementById('weak-count').innerText = `${weakCount}問`;
+    },
+
+    openSettings(mode) {
+        AudioEngine.playClick();
+        this.pendingMode = mode;
+        const modal = document.getElementById('modal-settings');
+        const title = document.getElementById('settings-title');
+        
+        // Mode Name
+        const names = { chem:'化学', bio:'生物', phys:'物理', mix:'全部ミックス', weak:'苦手特訓' };
+        title.innerText = `${names[mode]} 設定`;
+
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('visible'), 10);
+    },
+
+    startGame(count) {
+        // Close settings
+        const modal = document.getElementById('modal-settings');
+        modal.classList.remove('visible');
+        setTimeout(() => modal.style.display = 'none', 200);
+
+        Game.init(this.pendingMode, count);
+        this.switchScreen('screen-game');
+    },
+
+    showList() {
+        AudioEngine.playClick();
+        this.switchScreen('screen-list');
+        this.switchTab(this.currentListTab);
+    },
+
+    switchTab(type) {
+        this.currentListTab = type;
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`tab-${type}`);
+        if(activeBtn) activeBtn.classList.add('active');
+
+        const container = document.getElementById('list-container');
+        container.innerHTML = '';
+        
+        const filteredQs = QUESTIONS.filter(q => q.type === type);
+        document.getElementById('list-total-count').innerText = filteredQs.length;
+        
+        // Update Tab Text with Counts
+        document.getElementById('tab-chem').innerText = `化学 (${QUESTIONS.filter(q=>q.type==='chem').length})`;
+        document.getElementById('tab-bio').innerText = `生物 (${QUESTIONS.filter(q=>q.type==='bio').length})`;
+        document.getElementById('tab-phys').innerText = `物理 (${QUESTIONS.filter(q=>q.type==='phys').length})`;
+
+        filteredQs.forEach((q, index) => {
+            const mastery = this.userData.mastery[q.id] || 0;
+            const isMastered = mastery >= CONFIG.passScore;
+            
+            const div = document.createElement('div');
+            div.className = `list-item ${q.type}`;
+            div.innerHTML = `
+                <div class="q-num">No.${index + 1}</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px; padding-right: 40px;">
+                    <span style="font-weight:bold; text-transform:uppercase; color:#888;">${q.type}</span>
+                    <span style="color:${isMastered ? '#00b894' : '#d63031'}">${isMastered ? '★習得済' : '未習得'}</span>
+                </div>
+                <div style="margin-bottom:0.5rem; font-weight:bold; padding-right: 10px;">${q.q}</div>
+                <div class="ans-hidden" onclick="this.classList.toggle('revealed')">A. ${q.ans}</div>
+                <div style="font-size:0.85rem; color:#636e72; margin-top:0.5rem; line-height:1.4;">${q.exp}</div>
+            `;
+            container.appendChild(div);
+        });
+    },
+
+    saveScore(score, mode) {
+        const modeName = { chem:'化学', bio:'生物', phys:'物理', mix:'Mix', weak:'特訓' };
+        this.userData.ranking.push({
+            score: score,
+            mode: modeName[mode] || mode,
+            date: new Date().toLocaleDateString()
+        });
+        
+        // Sort and keep top 5
+        this.userData.ranking.sort((a, b) => b.score - a.score);
+        this.userData.ranking = this.userData.ranking.slice(0, 5);
+        
+        this.saveData();
+    },
+
+    showRanking() {
+        AudioEngine.playClick();
+        const list = document.getElementById('ranking-list');
+        list.innerHTML = '';
+        
+        const ranks = this.userData.ranking;
+        if (ranks.length === 0) {
+            list.innerHTML = '<li style="padding:1rem; text-align:center; color:#888;">データがありません</li>';
+        } else {
+            ranks.forEach((r, i) => {
+                const li = document.createElement('li');
+                li.className = 'ranking-item';
+                let badgeClass = '';
+                if(i===0) badgeClass = 'rank-1';
+                if(i===1) badgeClass = 'rank-2';
+                if(i===2) badgeClass = 'rank-3';
+                
+                li.innerHTML = `
+                    <div><span class="rank-badge ${badgeClass}">${i+1}</span> ${r.score} pts</div>
+                    <div style="font-size:0.8rem; color:#666;">${r.mode} / ${r.date}</div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        const modal = document.getElementById('modal-ranking');
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('visible'));
+    },
+
+    goHome() {
+        AudioEngine.playClick();
+        this.renderMenu();
+        this.switchScreen('screen-menu');
+    },
+
+    switchScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0,0);
+    }
+};
+
+const Game = {
+    queue: [],
+    currentQ: null,
+    score: 0,
+    combo: 0,
+    currentMode: '',
+    isProcessing: false,
+    selfCheckResult: false,
+
+    init(mode, count) {
+        this.score = 0;
+        this.combo = 0;
+        this.currentMode = mode;
+        this.updateHUD();
+
+        let pool = [];
+        // Filtering
+        if (mode === 'mix') {
+            pool = QUESTIONS;
+        } else if (mode === 'weak') {
+            pool = QUESTIONS.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore);
+            if(pool.length === 0) {
+                alert("苦手な問題はありません！全問マスター済みです！");
+                App.goHome();
+                return;
+            }
+        } else {
+            pool = QUESTIONS.filter(q => q.type === mode);
+        }
+
+        // Shuffle logic (Prioritize unmastered if NOT mix, or simple shuffle)
+        let shuffled = [];
+        if (mode === 'mix') {
+            shuffled = this.shuffle([...pool]);
+        } else {
+            const unmastered = this.shuffle(pool.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore));
+            const mastered = this.shuffle(pool.filter(q => (App.userData.mastery[q.id] || 0) >= CONFIG.passScore));
+            shuffled = [...unmastered, ...mastered];
+        }
+        
+        // Limit Count
+        if (count !== 999 && shuffled.length > count) {
+            shuffled = shuffled.slice(0, count);
+        }
+        
+        this.queue = shuffled;
+        
+        if (this.queue.length === 0) {
+             alert("問題がありません。");
+             App.goHome();
+             return;
+        }
+
+        this.nextQuestion();
+    },
+
+    nextQuestion() {
+        AudioEngine.playClick();
+        const modal = document.getElementById('modal-result');
+        modal.classList.remove('visible');
+        setTimeout(() => modal.style.display = 'none', 200);
+
+        if (this.queue.length === 0) {
+            // Finish Game
+            App.saveScore(this.score, this.currentMode);
+            alert(`終了！\nScore: ${this.score}`);
+            App.showRanking(); // Show ranking after game
+            App.goHome();
+            return;
+        }
+
+        this.currentQ = this.queue.shift();
+        this.renderQuestion();
+    },
+
+    renderQuestion() {
+        const q = this.currentQ;
+        if (!q) return;
+
+        const typeNames = { chem: '化学', bio: '生物', phys: '物理' };
+        
+        const card = document.querySelector('.card');
+        const badge = document.getElementById('q-badge');
+        const qText = document.getElementById('q-text');
+        const p1 = document.getElementById('phase-1');
+        const p2 = document.getElementById('phase-2');
+        
+        if (card) {
+            card.classList.remove('anim-pop');
+            void card.offsetWidth; 
+            card.classList.add('anim-pop');
+        }
+
+        let color = 'var(--dark)';
+        if(q.type === 'chem') color = 'var(--chem)';
+        if(q.type === 'bio') color = 'var(--bio)';
+        if(q.type === 'phys') color = 'var(--phys)';
+        
+        if (badge) {
+            badge.style.background = color;
+            badge.innerText = typeNames[q.type] || q.type;
+        }
+
+        if (qText) {
+            qText.innerText = q.q;
+        }
+
+        // Phase 1 (Self Check) ON, Phase 2 (Choices) OFF
+        if (p1) p1.style.display = 'block';
+        if (p2) {
+            p2.style.display = 'none';
+            p2.innerHTML = '';
+        }
+    },
+
+    // Step 1: Self Check
+    handleSelfCheck(isKnown) {
+        AudioEngine.playClick();
+        this.selfCheckResult = isKnown;
+        
+        // Hide P1, Show P2
+        document.getElementById('phase-1').style.display = 'none';
+        this.showChoices(); // Generate and show 4 choices
+    },
+
+    // Step 2: Show 4 Choices
+    showChoices() {
+        const p2 = document.getElementById('phase-2');
+        p2.style.display = 'grid';
+        p2.innerHTML = ''; // Clear previous
+
+        const choices = this.shuffle([...this.currentQ.choices]);
+        
+        choices.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-choice';
+            btn.innerText = c;
+            btn.onclick = () => this.handleAnswer(c);
+            p2.appendChild(btn);
+        });
+    },
+
+    // Step 3: Handle Choice Selection
+    handleAnswer(userAns) {
+        if (this.isProcessing) return;
+        
+        const isCorrectChoice = (userAns === this.currentQ.ans);
+        const qId = this.currentQ.id;
+        
+        // Logic:
+        // - Mastery UP ONLY if (SelfCheck=True AND Choice=Correct)
+        // - Mastery DOWN/Reset if (SelfCheck=False OR Choice=Wrong)
+        
+        if (this.selfCheckResult && isCorrectChoice) {
+            // Perfect!
+            this.score += 10 + (this.combo * 2);
+            this.combo++;
+            let level = App.userData.mastery[qId] || 0;
+            App.userData.mastery[qId] = level + 1;
+            AudioEngine.playCorrect();
+            this.showResult(true);
+        } else {
+            // Either didn't know or chose wrong
+            this.combo = 0;
+            let level = App.userData.mastery[qId] || 0;
+            App.userData.mastery[qId] = Math.max(0, level - 1);
+            
+            this.queue.push(this.currentQ); // Re-queue for review
+            
+            // Show result based on choice accuracy, even if mastery didn't go up
+            if (isCorrectChoice) {
+                // Correct choice but "didn't know" -> "Safe" but no mastery
+                AudioEngine.playCorrect(); // Correct sound but warning visual
+                this.showResult(true, true); // true, but "lucky" flag
+            } else {
+                AudioEngine.playWrong();
+                this.showResult(false);
+            }
+        }
+
+        this.updateHUD();
+        App.saveData();
+    },
+
+    showResult(isCorrect, isLucky = false) {
+        const modal = document.getElementById('modal-result');
+        const icon = document.getElementById('res-icon');
+        const title = document.getElementById('res-title');
+        const disp = document.getElementById('res-ans-display');
+        const exp = document.getElementById('res-exp');
+        const btn = document.getElementById('btn-next');
+
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('visible'));
+
+        // Always show answer
+        const ansHTML = `<div style="font-size:1.5rem; font-weight:bold; color:var(--dark); margin:0.5rem 0;">A. ${this.currentQ.ans}</div>`;
+        disp.innerHTML = ansHTML;
+
+        if (isCorrect) {
+            icon.innerText = '⭕';
+            if (isLucky) {
+                title.innerText = '正解！(未習得)';
+                title.style.color = '#e67e22'; // Orange for warning
+                btn.innerText = '次は自信を持って！';
+                btn.style.background = '#e67e22';
+            } else {
+                title.innerText = 'Nice!';
+                title.style.color = 'var(--dark)';
+                btn.innerText = '次へ';
+                btn.style.background = 'var(--dark)';
+            }
+        } else {
+            icon.innerText = '💪';
+            title.innerText = 'ドンマイ！';
+            title.style.color = '#d63031';
+            btn.innerText = '覚える！';
+            btn.style.background = '#d63031';
+        }
+
+        exp.innerHTML = this.currentQ.exp;
+    },
+
+    updateHUD() {
+        document.getElementById('score-val').innerText = this.score;
+        document.getElementById('combo-val').innerText = this.combo;
+    },
+
+    shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+};
+
+window.onload = () => App.init();
+
+</script>
+</body>
+</html>
