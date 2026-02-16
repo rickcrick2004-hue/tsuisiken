@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>中3追試験対策アプリ</title>
     <meta name="description" content="中学理科の重要語句・公式定着アプリ">
-    <script>
-        // エラーハンドリング（デバッグ用）
-        window.onerror = function(msg, url, line, col, error) {
-            alert("エラーが発生しました:\n" + msg + "\n行: " + line + ", 列: " + col);
-        };
-    </script>
     <style>
         /* --- CSS Variables & Reset --- */
         :root {
@@ -690,7 +684,7 @@
  * ---------------------------------------------------------
  */
 const CONFIG = {
-    ver: "ver 3.6.8",
+    ver: "ver 3.6.9",
     passScore: 2 // 2 times to master
 };
 
@@ -747,19 +741,11 @@ const QUESTIONS = [
     { id: 'c48', type: 'chem', q: '硫酸バリウムの化学式は？', choices: ['BaSO₄', 'Ba₂SO₄', 'Ba(SO₄)₂', 'BaS'], ans: 'BaSO₄', exp: '水に溶けにくい白い沈殿となります。' },
     { id: 'c49', type: 'chem', q: '硫化鉄の化学式は？', choices: ['FeS', 'FeS₂', 'Fe₂S', 'Fe₂S₃'], ans: 'FeS', exp: '鉄と硫黄の混合物を加熱するとできます。' },
     { id: 'c50', type: 'chem', q: '塩化水素の化学式は？', choices: ['HCl', 'H₂Cl', 'HCl₂', 'ClH'], ans: 'HCl', exp: '水に溶けると塩酸になります。' },
-    { id: 'c64', type: 'chem', q: '炭酸イオンのイオン式は？', choices: ['CO₃²⁻', 'CO₃⁻', 'C⁴⁺', 'CO₂'], ans: 'CO₃²⁻', exp: '2価の陰イオンです。' },
-    { id: 'c65', type: 'chem', q: 'アンモニウムイオンのイオン式は？', choices: ['NH₄⁺', 'NH₃⁺', 'NH₄⁻', 'N³⁻'], ans: 'NH₄⁺', exp: '多原子イオンで、1価の陽イオンです。' },
-    { id: 'c66', type: 'chem', q: '水酸化物イオンのイオン式は？', choices: ['OH⁻', 'OH⁺', 'O²⁻', 'H⁺'], ans: 'OH⁻', exp: 'アルカリ性を示す原因となるイオンです。' },
-    { id: 'c67', type: 'chem', q: '銅イオンのイオン式は？', choices: ['Cu²⁺', 'Cu⁺', 'Cu³⁺', 'Cu⁻'], ans: 'Cu²⁺', exp: '水溶液中では青色を示します。' },
-    { id: 'c68', type: 'chem', q: '銀イオンのイオン式は？', choices: ['Ag⁺', 'Ag²⁺', 'Ag⁻', 'Ag³⁺'], ans: 'Ag⁺', exp: '1価の陽イオンです。' },
-    { id: 'c69', type: 'chem', q: 'マグネシウムイオンのイオン式は？', choices: ['Mg²⁺', 'Mg⁺', 'Mg³⁺', 'Mg⁻'], ans: 'Mg²⁺', exp: '2価の陽イオンです。' },
-    { id: 'c70', type: 'chem', q: 'アルミニウムイオンのイオン式は？', choices: ['Al³⁺', 'Al²⁺', 'Al⁺', 'Al⁴⁺'], ans: 'Al³⁺', exp: '3価の陽イオンです。' },
-    { id: 'c71', type: 'chem', q: '水素イオンのイオン式は？', choices: ['H⁺', 'H⁻', 'H²⁺', 'OH⁻'], ans: 'H⁺', exp: '酸性を示す原因となるイオンです。' },
-    { id: 'c72', type: 'chem', q: '硫酸銅水溶液の電離を表す式は？', choices: ['CuSO₄ → Cu²⁺ + SO₄²⁻', 'CuSO₄ → Cu⁺ + SO₄⁻', 'CuSO₄ → Cu + S + 4O', 'CuSO₄ → Cu²⁺ + S²⁻ + 4O²⁻'], ans: 'CuSO₄ → Cu²⁺ + SO₄²⁻', exp: '銅イオン(Cu²⁺)と硫酸イオン(SO₄²⁻)に電離します。' },
     { id: 'c51', type: 'chem', q: '塩酸の電離を表す式は？', choices: ['HCl → H⁺ + Cl⁻', 'HCl → H + Cl', 'HCl → H⁻ + Cl⁺', 'HCl → H₂ + Cl₂'], ans: 'HCl → H⁺ + Cl⁻', exp: '水素イオンと塩化物イオンに電離します。' },
     { id: 'c52', type: 'chem', q: '塩化ナトリウム水溶液の電離を表す式は？', choices: ['NaCl → Na⁺ + Cl⁻', 'NaCl → Na + Cl', 'NaCl → Na⁻ + Cl⁺', 'NaCl → Na²⁺ + Cl²⁻'], ans: 'NaCl → Na⁺ + Cl⁻', exp: 'ナトリウムイオンと塩化物イオンに電離します。' },
     { id: 'c53', type: 'chem', q: '塩化銅水溶液の電離を表す式は？', choices: ['CuCl₂ → Cu²⁺ + 2Cl⁻', 'CuCl₂ → Cu⁺ + Cl₂⁻', 'CuCl → Cu⁺ + Cl⁻', 'CuCl₂ → Cu + Cl₂'], ans: 'CuCl₂ → Cu²⁺ + 2Cl⁻', exp: '銅イオン(Cu²⁺)と塩化物イオン(Cl⁻)に電離します。係数に注意！' },
     { id: 'c54', type: 'chem', q: '水酸化ナトリウム水溶液の電離を表す式は？', choices: ['NaOH → Na⁺ + OH⁻', 'NaOH → Na + OH', 'NaOH → Na⁺ + O²⁻ + H⁺', 'NaOH → N⁺ + aOH⁻'], ans: 'NaOH → Na⁺ + OH⁻', exp: 'ナトリウムイオンと水酸化物イオンに電離します。' },
+    { id: 'c72', type: 'chem', q: '硫酸銅水溶液の電離を表す式は？', choices: ['CuSO₄ → Cu²⁺ + SO₄²⁻', 'CuSO₄ → Cu⁺ + SO₄⁻', 'CuSO₄ → Cu + S + 4O', 'CuSO₄ → Cu²⁺ + S²⁻ + 4O²⁻'], ans: 'CuSO₄ → Cu²⁺ + SO₄²⁻', exp: '銅イオン(Cu²⁺)と硫酸イオン(SO₄²⁻)に電離します。' },
     { id: 'c55', type: 'chem', q: '塩酸の電気分解の化学反応式は？', choices: ['2HCl → H₂ + Cl₂', 'HCl → H + Cl', 'HCl → H₂ + Cl₂', '2HCl → 2H + 2Cl'], ans: '2HCl → H₂ + Cl₂', exp: '水素と塩素が発生します。' },
     { id: 'c56', type: 'chem', q: '塩化銅水溶液の電気分解の化学反応式は？', choices: ['CuCl₂ → Cu + Cl₂', 'CuCl₂ → Cu + 2Cl', '2CuCl → 2Cu + Cl₂', 'CuCl → Cu + Cl'], ans: 'CuCl₂ → Cu + Cl₂', exp: '銅と塩素が発生します。' },
     { id: 'c57', type: 'chem', q: '銅の酸化の化学反応式は？', choices: ['2Cu + O₂ → 2CuO', 'Cu + O → CuO', 'Cu + O₂ → CuO₂', '2Cu + O → Cu₂O'], ans: '2Cu + O₂ → 2CuO', exp: '銅原子と酸素分子が反応して酸化銅になります。' },
@@ -769,6 +755,14 @@ const QUESTIONS = [
     { id: 'c61', type: 'chem', q: '水の電気分解の化学反応式は？', choices: ['2H₂O → 2H₂ + O₂', 'H₂O → H₂ + O', '2H₂O → 2H₂ + 2O', 'H₂O → H + OH'], ans: '2H₂O → 2H₂ + O₂', exp: '水素と酸素が発生します。体積比は2:1です。' },
     { id: 'c62', type: 'chem', q: '炭酸水素ナトリウムの熱分解の化学反応式は？', choices: ['2NaHCO₃ → Na₂CO₃ + H₂O + CO₂', 'NaHCO₃ → NaCO₃ + H + O', '2NaHCO₃ → Na₂CO₃ + H₂ + O₂', 'NaHCO₃ → Na + H + C + O₃'], ans: '2NaHCO₃ → Na₂CO₃ + H₂O + CO₂', exp: '炭酸ナトリウム、水、二酸化炭素の3つに分解されます。' },
     { id: 'c63', type: 'chem', q: '硫酸イオンのイオン式は？', choices: ['SO₄²⁻', 'SO₄⁻', 'S²⁻', 'SO₃²⁻'], ans: 'SO₄²⁻', exp: '2価の陰イオンです。' },
+    { id: 'c64', type: 'chem', q: '炭酸イオンのイオン式は？', choices: ['CO₃²⁻', 'CO₃⁻', 'C⁴⁺', 'CO₂'], ans: 'CO₃²⁻', exp: '2価の陰イオンです。' },
+    { id: 'c65', type: 'chem', q: 'アンモニウムイオンのイオン式は？', choices: ['NH₄⁺', 'NH₃⁺', 'NH₄⁻', 'N³⁻'], ans: 'NH₄⁺', exp: '多原子イオンで、1価の陽イオンです。' },
+    { id: 'c66', type: 'chem', q: '水酸化物イオンのイオン式は？', choices: ['OH⁻', 'OH⁺', 'O²⁻', 'H⁺'], ans: 'OH⁻', exp: 'アルカリ性を示す原因となるイオンです。' },
+    { id: 'c67', type: 'chem', q: '銅イオンのイオン式は？', choices: ['Cu²⁺', 'Cu⁺', 'Cu³⁺', 'Cu⁻'], ans: 'Cu²⁺', exp: '水溶液中では青色を示します。' },
+    { id: 'c68', type: 'chem', q: '銀イオンのイオン式は？', choices: ['Ag⁺', 'Ag²⁺', 'Ag⁻', 'Ag³⁺'], ans: 'Ag⁺', exp: '1価の陽イオンです。' },
+    { id: 'c69', type: 'chem', q: 'マグネシウムイオンのイオン式は？', choices: ['Mg²⁺', 'Mg⁺', 'Mg³⁺', 'Mg⁻'], ans: 'Mg²⁺', exp: '2価の陽イオンです。' },
+    { id: 'c70', type: 'chem', q: 'アルミニウムイオンのイオン式は？', choices: ['Al³⁺', 'Al²⁺', 'Al⁺', 'Al⁴⁺'], ans: 'Al³⁺', exp: '3価の陽イオンです。' },
+    { id: 'c71', type: 'chem', q: '水素イオンのイオン式は？', choices: ['H⁺', 'H⁻', 'H²⁺', 'OH⁻'], ans: 'H⁺', exp: '酸性を示す原因となるイオンです。' },
 
     // --- 生物 (Biology) 76問 ---
     { id: 'b1', type: 'bio', q: 'だ液に含まれる消化酵素は？', choices: ['アミラーゼ', 'ペプシン', 'リパーゼ', 'トリプシン'], ans: 'アミラーゼ', exp: 'デンプンを麦芽糖などに分解します。' },
@@ -864,8 +858,8 @@ const QUESTIONS = [
     { id: 'p13', type: 'phys', q: '電流が磁界から受ける力を利用して回転する装置は？', choices: ['モーター', '発電機', '変圧器', '電磁石'], ans: 'モーター', exp: 'フレミングの左手の法則が働いています。' },
     { id: 'p14', type: 'phys', q: 'コイルの中の磁界が変化すると、コイルに電圧が生じる現象は？', choices: ['電磁誘導', '静電誘導', '誘電分極', '放電'], ans: '電磁誘導', exp: 'この時流れる電流を誘導電流といいます。発電機の原理です。' },
     { id: 'p15', type: 'phys', q: '家庭のコンセントのように、電流の向きと大きさが周期的に変わる電気は？', choices: ['交流', '直流', '整流', '過電流'], ans: '交流', exp: '東日本は50Hz、西日本は60Hzです。電池は直流です。' },
-    { id: 'p16', type: 'phys', q: '物体がその運動の状態を続けようとする性質を何という？', choices: ['慣性', '惰性', '弾性', '剛性'], ans: '慣性', exp: '急ブレーキで体が前にのめるのはこのためです。' },
-    { id: 'p17', type: 'phys', q: '物体に力を加えて、その向きに動かしたとき、力×距離で表される量は？', choices: ['作用・反作用の法則', '慣性の法則', '力のつり合い', '運動の法則'], ans: '作用・反作用の法則', exp: '壁を押すと、壁からも押し返されています。' },
+    { id: 'p16', type: 'phys', q: '物体Aが物体Bに力を加えると、物体Aも物体Bから、同じ大きさで逆向きの力を受ける法則を何という？', choices: ['作用・反作用の法則', '慣性の法則', '力のつり合い', '運動の法則'], ans: '作用・反作用の法則', exp: '壁を押すと、壁からも押し返されています。' },
+    { id: 'p17', type: 'phys', q: '物体に力を加えて、その向きに動かしたとき、力×距離で表される量は？', choices: ['仕事', '仕事率', 'エネルギー', '負荷'], ans: '仕事', exp: '単位はジュール(J)です。動かない場合は仕事は0です。' },
     { id: 'p18', type: 'phys', q: '速さが一定で一直線上を進む運動を何という？', choices: ['等速直線運動', '等加速度運動', '自由落下', '単振動'], ans: '等速直線運動', exp: '力が働いていないか、力がつり合っている時の運動です。' },
     { id: 'p19', type: 'phys', q: '運動している物体が持っているエネルギーは？', choices: ['運動エネルギー', '位置エネルギー', '弾性エネルギー', '熱エネルギー'], ans: '運動エネルギー', exp: '質量が大きいほど、また速さが速いほど大きくなります。' },
     { id: 'p20', type: 'phys', q: '高い所にある物体が持っているエネルギーは？', choices: ['位置エネルギー', '運動エネルギー', '化学エネルギー', '核エネルギー'], ans: '位置エネルギー', exp: '質量が大きいほど、また高さが高いほど大きくなります。' },
@@ -898,32 +892,60 @@ const AudioEngine = {
         if (!this.ctx) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
+        
         osc.type = type;
         osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+        
         gain.gain.setValueAtTime(0.1, this.ctx.currentTime + startTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
+        
         osc.connect(gain);
         gain.connect(this.ctx.destination);
+        
         osc.start(this.ctx.currentTime + startTime);
         osc.stop(this.ctx.currentTime + startTime + duration);
     },
-    playCorrect() { this.init(); this.playTone(880, 'sine', 0.1, 0); this.playTone(1760, 'sine', 0.4, 0.1); },
-    playWrong() { this.init(); this.playTone(150, 'sawtooth', 0.15, 0); this.playTone(150, 'sawtooth', 0.3, 0.2); },
-    playClick() { this.init(); this.playTone(800, 'triangle', 0.05, 0); }
+
+    playCorrect() {
+        this.init();
+        this.playTone(880, 'sine', 0.1, 0); // A5
+        this.playTone(1760, 'sine', 0.4, 0.1); // A6
+    },
+
+    playWrong() {
+        this.init();
+        this.playTone(150, 'sawtooth', 0.15, 0);
+        this.playTone(150, 'sawtooth', 0.3, 0.2);
+    },
+    
+    playClick() {
+        this.init();
+        this.playTone(800, 'triangle', 0.05, 0);
+    }
 };
 
-// --- APP CONTROLLER ---
 const App = {
-    userData: { mastery: {}, wrongs: [], ranking: [] },
-    currentCategory: '', // 'chem', 'bio', 'phys', 'mix', 'weak'
+    userData: {
+        mastery: {}, // { id: level }
+        wrongs: [],
+        ranking: [] // Array of {score, mode, date}
+    },
     currentListTab: 'chem',
+    pendingMode: '', // For settings modal
 
     init() {
         document.getElementById('ver-display').innerText = CONFIG.ver;
         document.title = "中3追試験対策アプリ " + CONFIG.ver;
+        
         this.loadData();
         this.renderMenu();
-        document.addEventListener('dblclick', function(event) { event.preventDefault(); }, { passive: false });
+
+        // Prevent double tap zoom
+        document.addEventListener('dblclick', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+        
+        // Init Audio on user interaction
         document.body.addEventListener('click', () => AudioEngine.init(), { once: true });
     },
 
@@ -933,7 +955,11 @@ const App = {
             this.userData = JSON.parse(d);
             if (!this.userData.ranking) this.userData.ranking = [];
         } else {
-            // Migration logic omitted for brevity
+            const v2 = localStorage.getItem('scienceApp_v2');
+            if(v2) {
+                this.userData = JSON.parse(v2);
+                this.userData.ranking = [];
+            }
             QUESTIONS.forEach(q => {
                 if(this.userData.mastery[q.id] === undefined) this.userData.mastery[q.id] = 0;
             });
@@ -960,63 +986,79 @@ const App = {
             const total = qs.length;
             const mastered = qs.filter(q => (this.userData.mastery[q.id] || 0) >= CONFIG.passScore).length;
             const percent = total === 0 ? 0 : Math.floor((mastered / total) * 100);
+
             document.getElementById(`prog-text-${type}`).innerText = `${percent}%`;
             document.getElementById(`prog-bar-${type}`).style.width = `${percent}%`;
         });
+
         const weakCount = QUESTIONS.filter(q => (this.userData.mastery[q.id] || 0) < CONFIG.passScore).length;
         document.getElementById('weak-count').innerText = `${weakCount}問`;
     },
 
-    // Step 1: Open Settings Modal
-    openSettings(category) {
+    openSettings(mode) {
         AudioEngine.playClick();
-        this.currentCategory = category;
+        this.pendingMode = mode;
         const modal = document.getElementById('modal-settings');
         const title = document.getElementById('settings-title');
         
         const names = { chem:'化学', bio:'生物', phys:'物理', mix:'全部ミックス', weak:'苦手特訓' };
-        title.innerText = `${names[category]} 設定`;
-
-        // Show Step 1, Hide Step 2
-        document.getElementById('settings-step-1').style.display = 'block';
-        document.getElementById('settings-step-2').style.display = 'none';
+        title.innerText = `${names[mode]} 設定`;
 
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('visible'), 10);
     },
 
-    // Step 2: Select Mode
-    selectMode(mode) {
+    startGame(count) {
         AudioEngine.playClick();
-        if (mode === 'flashcard') {
-            // Flashcard Mode -> Start immediately
-            this.closeSettings();
-            Flashcard.init(this.currentCategory);
-            this.switchScreen('screen-flashcard');
-        } else {
-            // Quiz Mode -> Choose count
-            if (this.currentCategory === 'weak') {
-                // Weak mode has no count selection, start immediately
-                this.startQuiz(999);
-            } else {
-                document.getElementById('settings-step-1').style.display = 'none';
-                document.getElementById('settings-step-2').style.display = 'block';
-            }
-        }
-    },
-
-    // Step 3: Start Quiz
-    startQuiz(count) {
-        AudioEngine.playClick();
-        this.closeSettings();
-        Game.init(this.currentCategory, count);
-        this.switchScreen('screen-game');
-    },
-
-    closeSettings() {
         const modal = document.getElementById('modal-settings');
         modal.classList.remove('visible');
         setTimeout(() => modal.style.display = 'none', 200);
+
+        Game.init(this.pendingMode, count);
+        this.switchScreen('screen-game');
+    },
+
+    showList() {
+        AudioEngine.playClick();
+        this.switchScreen('screen-list');
+        this.switchTab(this.currentListTab);
+    },
+
+    switchTab(type) {
+        this.currentListTab = type;
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`tab-${type}`);
+        if(activeBtn) activeBtn.classList.add('active');
+
+        const container = document.getElementById('list-container');
+        container.innerHTML = '';
+        
+        const filteredQs = QUESTIONS.filter(q => q.type === type);
+        document.getElementById('list-total-count').innerText = filteredQs.length;
+        
+        document.getElementById('tab-chem').innerText = `化学 (${QUESTIONS.filter(q=>q.type==='chem').length})`;
+        document.getElementById('tab-bio').innerText = `生物 (${QUESTIONS.filter(q=>q.type==='bio').length})`;
+        document.getElementById('tab-phys').innerText = `物理 (${QUESTIONS.filter(q=>q.type==='phys').length})`;
+
+        filteredQs.forEach((q, index) => {
+            const mastery = this.userData.mastery[q.id] || 0;
+            const isMastered = mastery >= CONFIG.passScore;
+            
+            const div = document.createElement('div');
+            div.className = `list-item ${q.type}`;
+            div.innerHTML = `
+                <div class="q-num">No.${index + 1}</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px; padding-right: 40px;">
+                    <span style="font-weight:bold; text-transform:uppercase; color:#888;">${q.type}</span>
+                    <span style="color:${isMastered ? '#00b894' : '#d63031'}">${isMastered ? '★習得済' : '未習得'}</span>
+                </div>
+                <div style="margin-bottom:0.5rem; font-weight:bold; padding-right: 10px;">${q.q}</div>
+                <div class="ans-hidden" onclick="this.classList.toggle('revealed')">A. ${q.ans}</div>
+                <div style="font-size:0.85rem; color:#636e72; margin-top:0.5rem; line-height:1.4;">${q.exp}</div>
+            `;
+            container.appendChild(div);
+        });
     },
 
     saveScore(score, mode) {
@@ -1026,8 +1068,10 @@ const App = {
             mode: modeName[mode] || mode,
             date: new Date().toLocaleDateString()
         });
+        
         this.userData.ranking.sort((a, b) => b.score - a.score);
         this.userData.ranking = this.userData.ranking.slice(0, 5);
+        
         this.saveData();
     },
 
@@ -1035,6 +1079,7 @@ const App = {
         AudioEngine.playClick();
         const list = document.getElementById('ranking-list');
         list.innerHTML = '';
+        
         const ranks = this.userData.ranking;
         if (ranks.length === 0) {
             list.innerHTML = '<li style="padding:1rem; text-align:center; color:#888;">データがありません</li>';
@@ -1046,44 +1091,18 @@ const App = {
                 if(i===0) badgeClass = 'rank-1';
                 if(i===1) badgeClass = 'rank-2';
                 if(i===2) badgeClass = 'rank-3';
-                li.innerHTML = `<div><span class="rank-badge ${badgeClass}">${i+1}</span> ${r.score} pts</div><div style="font-size:0.8rem; color:#666;">${r.mode} / ${r.date}</div>`;
+                
+                li.innerHTML = `
+                    <div><span class="rank-badge ${badgeClass}">${i+1}</span> ${r.score} pts</div>
+                    <div style="font-size:0.8rem; color:#666;">${r.mode} / ${r.date}</div>
+                `;
                 list.appendChild(li);
             });
         }
+
         const modal = document.getElementById('modal-ranking');
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('visible'));
-    },
-
-    showList() {
-        AudioEngine.playClick();
-        this.switchScreen('screen-list');
-        this.switchTab(this.currentListTab);
-    },
-
-    switchTab(type) {
-        this.currentListTab = type;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`tab-${type}`);
-        if(activeBtn) activeBtn.classList.add('active');
-
-        const container = document.getElementById('list-container');
-        container.innerHTML = '';
-        const filteredQs = QUESTIONS.filter(q => q.type === type);
-        document.getElementById('list-total-count').innerText = filteredQs.length;
-        
-        document.getElementById('tab-chem').innerText = `化学 (${QUESTIONS.filter(q=>q.type==='chem').length})`;
-        document.getElementById('tab-bio').innerText = `生物 (${QUESTIONS.filter(q=>q.type==='bio').length})`;
-        document.getElementById('tab-phys').innerText = `物理 (${QUESTIONS.filter(q=>q.type==='phys').length})`;
-
-        filteredQs.forEach((q, index) => {
-            const mastery = this.userData.mastery[q.id] || 0;
-            const isMastered = mastery >= CONFIG.passScore;
-            const div = document.createElement('div');
-            div.className = `list-item ${q.type}`;
-            div.innerHTML = `<div class="q-num">No.${index + 1}</div><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px; padding-right: 40px;"><span style="font-weight:bold; text-transform:uppercase; color:#888;">${q.type}</span><span style="color:${isMastered ? '#00b894' : '#d63031'}">${isMastered ? '★習得済' : '未習得'}</span></div><div style="margin-bottom:0.5rem; font-weight:bold; padding-right: 10px;">${q.q}</div><div class="ans-hidden" onclick="this.classList.toggle('revealed')">A. ${q.ans}</div><div style="font-size:0.85rem; color:#636e72; margin-top:0.5rem; line-height:1.4;">${q.exp}</div>`;
-            container.appendChild(div);
-        });
     },
 
     goHome() {
@@ -1099,30 +1118,59 @@ const App = {
     }
 };
 
-// --- GAME LOGIC (Quiz) ---
 const Game = {
-    queue: [], currentQ: null, score: 0, combo: 0, currentMode: '', isProcessing: false, selfCheckResult: false,
+    queue: [],
+    currentQ: null,
+    score: 0,
+    combo: 0,
+    currentMode: '',
+    isProcessing: false,
+    selfCheckResult: false,
 
     init(mode, count) {
-        this.score = 0; this.combo = 0; this.currentMode = mode; this.updateHUD();
-        let pool = [];
-        if (mode === 'mix') pool = QUESTIONS;
-        else if (mode === 'weak') {
-            pool = QUESTIONS.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore);
-            if(pool.length === 0) { alert("苦手な問題はありません！全問マスター済みです！"); App.goHome(); return; }
-        } else pool = QUESTIONS.filter(q => q.type === mode);
+        this.score = 0;
+        this.combo = 0;
+        this.currentMode = mode;
+        this.updateHUD();
 
+        let pool = [];
+        // Filtering
+        if (mode === 'mix') {
+            pool = QUESTIONS;
+        } else if (mode === 'weak') {
+            pool = QUESTIONS.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore);
+            if(pool.length === 0) {
+                alert("苦手な問題はありません！全問マスター済みです！");
+                App.goHome();
+                return;
+            }
+        } else {
+            pool = QUESTIONS.filter(q => q.type === mode);
+        }
+
+        // Shuffle logic (Prioritize unmastered if NOT mix, or simple shuffle)
         let shuffled = [];
-        if (mode === 'mix') shuffled = this.shuffle([...pool]);
-        else {
+        if (mode === 'mix') {
+            shuffled = this.shuffle([...pool]);
+        } else {
             const unmastered = this.shuffle(pool.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore));
             const mastered = this.shuffle(pool.filter(q => (App.userData.mastery[q.id] || 0) >= CONFIG.passScore));
             shuffled = [...unmastered, ...mastered];
         }
         
-        if (count !== 999 && shuffled.length > count) shuffled = shuffled.slice(0, count);
+        // Limit Count
+        if (count !== 999 && shuffled.length > count) {
+            shuffled = shuffled.slice(0, count);
+        }
+        
         this.queue = shuffled;
-        if (this.queue.length === 0) { alert("問題がありません。"); App.goHome(); return; }
+        
+        if (this.queue.length === 0) {
+             alert("問題がありません。");
+             App.goHome();
+             return;
+        }
+
         this.nextQuestion();
     },
 
@@ -1133,10 +1181,14 @@ const Game = {
         setTimeout(() => modal.style.display = 'none', 200);
 
         if (this.queue.length === 0) {
+            // Finish Game
             App.saveScore(this.score, this.currentMode);
             alert(`終了！\nScore: ${this.score}`);
-            App.showRanking(); App.goHome(); return;
+            App.showRanking(); // Show ranking after game
+            App.goHome();
+            return;
         }
+
         this.currentQ = this.queue.shift();
         this.renderQuestion();
     },
@@ -1144,36 +1196,61 @@ const Game = {
     renderQuestion() {
         const q = this.currentQ;
         if (!q) return;
+
         const typeNames = { chem: '化学', bio: '生物', phys: '物理' };
+        
         const card = document.querySelector('#screen-game .card');
         const badge = document.getElementById('q-badge');
         const qText = document.getElementById('q-text');
+        const p1 = document.getElementById('phase-1');
+        const p2 = document.getElementById('phase-2');
         
-        if(card) { card.classList.remove('anim-pop'); void card.offsetWidth; card.classList.add('anim-pop'); }
+        if (card) {
+            card.classList.remove('anim-pop');
+            void card.offsetWidth; 
+            card.classList.add('anim-pop');
+        }
+
         let color = 'var(--dark)';
         if(q.type === 'chem') color = 'var(--chem)';
         if(q.type === 'bio') color = 'var(--bio)';
         if(q.type === 'phys') color = 'var(--phys)';
-        if(badge) { badge.style.background = color; badge.innerText = typeNames[q.type] || q.type; }
-        if(qText) qText.innerText = q.q;
+        
+        if (badge) {
+            badge.style.background = color;
+            badge.innerText = typeNames[q.type] || q.type;
+        }
 
-        document.getElementById('phase-1').style.display = 'block';
-        document.getElementById('phase-2').style.display = 'none';
-        document.getElementById('phase-2').innerHTML = '';
+        if (qText) {
+            qText.innerText = q.q;
+        }
+
+        // Phase 1 (Self Check) ON, Phase 2 (Choices) OFF
+        if (p1) p1.style.display = 'block';
+        if (p2) {
+            p2.style.display = 'none';
+            p2.innerHTML = '';
+        }
     },
 
+    // Step 1: Self Check
     handleSelfCheck(isKnown) {
         AudioEngine.playClick();
         this.selfCheckResult = isKnown;
+        
+        // Hide P1, Show P2
         document.getElementById('phase-1').style.display = 'none';
-        this.showChoices();
+        this.showChoices(); // Generate and show 4 choices
     },
 
+    // Step 2: Show 4 Choices
     showChoices() {
         const p2 = document.getElementById('phase-2');
         p2.style.display = 'grid';
-        p2.innerHTML = '';
+        p2.innerHTML = ''; // Clear previous
+
         const choices = this.shuffle([...this.currentQ.choices]);
+        
         choices.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'btn-choice';
@@ -1183,23 +1260,46 @@ const Game = {
         });
     },
 
+    // Step 3: Handle Choice Selection
     handleAnswer(userAns) {
         if (this.isProcessing) return;
+        
         const isCorrectChoice = (userAns === this.currentQ.ans);
         const qId = this.currentQ.id;
         
+        // Logic:
+        // - Mastery UP ONLY if (SelfCheck=True AND Choice=Correct)
+        // - Mastery DOWN/Reset if (SelfCheck=False OR Choice=Wrong)
+        
         if (this.selfCheckResult && isCorrectChoice) {
-            this.score += 10 + (this.combo * 2); this.combo++;
-            let level = App.userData.mastery[qId] || 0; App.userData.mastery[qId] = level + 1;
-            AudioEngine.playCorrect(); this.showResult(true);
+            // Perfect!
+            this.score += 10 + (this.combo * 2);
+            this.combo++;
+            let level = App.userData.mastery[qId] || 0;
+            App.userData.mastery[qId] = level + 1;
+            AudioEngine.playCorrect();
+            this.showResult(true);
         } else {
+            // Either didn't know or chose wrong
             this.combo = 0;
-            let level = App.userData.mastery[qId] || 0; App.userData.mastery[qId] = Math.max(0, level - 1);
-            this.queue.push(this.currentQ);
-            if (isCorrectChoice) { AudioEngine.playCorrect(); this.showResult(true, true); }
-            else { AudioEngine.playWrong(); this.showResult(false); }
+            let level = App.userData.mastery[qId] || 0;
+            App.userData.mastery[qId] = Math.max(0, level - 1);
+            
+            this.queue.push(this.currentQ); // Re-queue for review
+            
+            // Show result based on choice accuracy, even if mastery didn't go up
+            if (isCorrectChoice) {
+                // Correct choice but "didn't know" -> "Safe" but no mastery
+                AudioEngine.playCorrect(); // Correct sound but warning visual
+                this.showResult(true, true); // true, but "lucky" flag
+            } else {
+                AudioEngine.playWrong();
+                this.showResult(false);
+            }
         }
-        this.updateHUD(); App.saveData();
+
+        this.updateHUD();
+        App.saveData();
     },
 
     showResult(isCorrect, isLucky = false) {
@@ -1209,20 +1309,35 @@ const Game = {
         const disp = document.getElementById('res-ans-display');
         const exp = document.getElementById('res-exp');
         const btn = document.getElementById('btn-next');
+
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('visible'));
 
-        disp.innerHTML = `<div style="font-size:1.5rem; font-weight:bold; color:var(--dark); margin:0.5rem 0;">A. ${this.currentQ.ans}</div>`;
+        // Always show answer
+        const ansHTML = `<div style="font-size:1.5rem; font-weight:bold; color:var(--dark); margin:0.5rem 0;">A. ${this.currentQ.ans}</div>`;
+        disp.innerHTML = ansHTML;
+
         if (isCorrect) {
             icon.innerText = '⭕';
             if (isLucky) {
-                title.innerText = '正解！(未習得)'; title.style.color = '#e67e22'; btn.innerText = '次は自信を持って！'; btn.style.background = '#e67e22';
+                title.innerText = '正解！(未習得)';
+                title.style.color = '#e67e22'; // Orange for warning
+                btn.innerText = '次は自信を持って！';
+                btn.style.background = '#e67e22';
             } else {
-                title.innerText = 'Nice!'; title.style.color = 'var(--dark)'; btn.innerText = '次へ'; btn.style.background = 'var(--dark)';
+                title.innerText = 'Nice!';
+                title.style.color = 'var(--dark)';
+                btn.innerText = '次へ';
+                btn.style.background = 'var(--dark)';
             }
         } else {
-            icon.innerText = '💪'; title.innerText = 'ドンマイ！'; title.style.color = '#d63031'; btn.innerText = '覚える！'; btn.style.background = '#d63031';
+            icon.innerText = '💪';
+            title.innerText = 'ドンマイ！';
+            title.style.color = '#d63031';
+            btn.innerText = '覚える！';
+            btn.style.background = '#d63031';
         }
+
         exp.innerHTML = this.currentQ.exp;
     },
 
@@ -1237,85 +1352,6 @@ const Game = {
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
-    }
-};
-
-// --- FLASHCARD LOGIC ---
-const Flashcard = {
-    list: [], currentIndex: 0,
-    
-    init(category) {
-        // Prepare list: if mix or weak, logic differs slightly, but mainly just sequential list
-        let pool = [];
-        if (category === 'mix') pool = QUESTIONS;
-        else if (category === 'weak') {
-            pool = QUESTIONS.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore);
-            if(pool.length === 0) { alert("苦手な問題はありません！"); App.goHome(); return; }
-        } else {
-            pool = QUESTIONS.filter(q => q.type === category);
-        }
-        
-        // No shuffle, preserve order (ID order in array)
-        this.list = pool;
-        this.currentIndex = 0;
-        
-        // UI Setup
-        const names = { chem:'化学', bio:'生物', phys:'物理', mix:'全部ミックス', weak:'苦手特訓' };
-        document.getElementById('fc-category-name').innerText = names[category] || category;
-        
-        this.render();
-    },
-    
-    render() {
-        if (this.list.length === 0) return;
-        
-        const q = this.list[this.currentIndex];
-        const typeNames = { chem: '化学', bio: '生物', phys: '物理' };
-        
-        // Update Counter
-        document.getElementById('fc-counter').innerText = `${this.currentIndex + 1} / ${this.list.length}`;
-        
-        // Update Content
-        const badge = document.getElementById('fc-badge');
-        let color = 'var(--dark)';
-        if(q.type === 'chem') color = 'var(--chem)';
-        if(q.type === 'bio') color = 'var(--bio)';
-        if(q.type === 'phys') color = 'var(--phys)';
-        badge.style.background = color;
-        badge.innerText = typeNames[q.type] || q.type;
-        
-        document.getElementById('fc-question').innerText = q.q;
-        document.getElementById('fc-answer').innerText = q.ans;
-        document.getElementById('fc-exp').innerHTML = q.exp;
-        
-        // Reset Answer visibility
-        document.getElementById('fc-answer-area').classList.remove('visible');
-    },
-    
-    toggleAnswer() {
-        AudioEngine.playClick();
-        document.getElementById('fc-answer-area').classList.toggle('visible');
-    },
-    
-    next() {
-        AudioEngine.playClick();
-        if (this.currentIndex < this.list.length - 1) {
-            this.currentIndex++;
-            this.render();
-        } else {
-            if(confirm('最後の問題です。最初に戻りますか？')) {
-                this.currentIndex = 0;
-                this.render();
-            }
-        }
-    },
-    
-    prev() {
-        AudioEngine.playClick();
-        if (this.currentIndex > 0) {
-            this.currentIndex--;
-            this.render();
-        }
     }
 };
 
