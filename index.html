@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>中3追試験対策アプリ</title>
     <meta name="description" content="中学理科の重要語句・公式定着アプリ">
+    <script>
+        // エラーハンドリング
+        window.onerror = function(msg, url, line, col, error) {
+            alert("エラーが発生しました。再読み込みしてください。\n" + msg);
+        };
+    </script>
     <style>
         /* --- CSS Variables & Reset --- */
         :root {
@@ -269,197 +275,74 @@
             text-align: right;
         }
 
-        /* --- Settings Modal (Mode & Count) --- */
-        .settings-section { margin-bottom: 1.5rem; }
+        /* --- Settings Modal --- */
         .settings-label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #666; text-align: left; }
-        
-        .mode-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-        .count-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .mode-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .count-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-select {
-            background: var(--white);
-            border: 2px solid var(--gray);
-            padding: 1rem;
-            border-radius: 8px;
-            font-weight: bold;
-            color: var(--dark);
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--white); border: 2px solid var(--gray); padding: 1rem; border-radius: 8px; font-weight: bold; color: var(--dark); cursor: pointer; transition: all 0.2s;
         }
-        .btn-select.selected {
-            background: var(--dark);
-            color: white;
-            border-color: var(--dark);
-        }
+        .btn-select.selected { background: var(--dark); color: white; border-color: var(--dark); }
         .btn-select:active { transform: scale(0.98); }
+        .btn-count {
+            background: var(--white); border: 2px solid var(--gray); padding: 1rem; border-radius: 8px; font-weight: bold; color: var(--dark); cursor: pointer;
+        }
+        .btn-count:active { background: #dfe6e9; }
 
         /* --- Flashcard Mode --- */
-        .flashcard-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
-            gap: 10px;
-        }
+        .flashcard-controls { display: flex; justify-content: space-between; margin-top: 1rem; gap: 10px; }
         .btn-nav {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            background: #dfe6e9;
-            color: var(--dark);
+            flex: 1; padding: 1rem; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem;
+            cursor: pointer; background: #dfe6e9; color: var(--dark);
         }
         .btn-nav:active { background: #b2bec3; }
         .flashcard-answer-area {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px dashed var(--gray);
-            display: none;
+            margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px dashed var(--gray); display: none;
         }
         .flashcard-answer-area.visible { display: block; animation: slideIn 0.2s; }
         .fc-counter { font-size: 0.9rem; color: #666; margin-bottom: 0.5rem; }
 
         /* --- Ranking --- */
-        .ranking-list {
-            list-style: none;
-            padding: 0;
-            text-align: left;
-        }
+        .ranking-list { list-style: none; padding: 0; text-align: left; }
         .ranking-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem;
-            border-bottom: 1px solid var(--gray);
-            font-weight: bold;
+            display: flex; justify-content: space-between; padding: 0.8rem; border-bottom: 1px solid var(--gray); font-weight: bold;
         }
-        .rank-badge {
-            display: inline-block;
-            width: 24px;
-            text-align: center;
-            margin-right: 8px;
-            color: #b2bec3;
-        }
+        .rank-badge { display: inline-block; width: 24px; text-align: center; margin-right: 8px; color: #b2bec3; }
         .rank-1 { color: #fdcb6e; font-size: 1.2rem; }
         .rank-2 { color: #b2bec3; font-size: 1.1rem; }
         .rank-3 { color: #e17055; font-size: 1.1rem; }
 
-        /* --- List Mode (Red Sheet) --- */
-        .list-header-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .btn-back-list {
-            background: none;
-            border: none;
-            color: var(--dark);
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            padding: 0;
-        }
+        /* --- List Mode --- */
+        .list-header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .btn-back-list { background: none; border: none; color: var(--dark); font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; padding: 0; }
         .list-stats { font-size: 0.9rem; color: #666; }
-
-        /* Tabs */
-        .tab-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1rem;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
+        .tab-container { display: flex; gap: 8px; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 4px; }
         .tab-btn {
-            flex: 1;
-            padding: 0.8rem 0.5rem;
-            background: var(--white);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            color: #666;
-            cursor: pointer;
-            text-align: center;
-            white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+            flex: 1; padding: 0.8rem 0.5rem; background: var(--white); border: 2px solid transparent; border-radius: 8px;
+            font-weight: bold; font-size: 0.9rem; color: #666; cursor: pointer; text-align: center; white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s;
         }
-        .tab-btn.active {
-            background: var(--dark);
-            color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
+        .tab-btn.active { background: var(--dark); color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         .tab-btn.t-chem.active { background: var(--chem); }
         .tab-btn.t-bio.active { background: var(--bio); }
         .tab-btn.t-phys.active { background: var(--phys); }
-
         .list-container { padding-bottom: 80px; }
         .list-item {
-            background: var(--white);
-            margin-bottom: 10px;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 6px solid #ccc;
-            position: relative;
+            background: var(--white); margin-bottom: 10px; padding: 1rem; border-radius: 8px; border-left: 6px solid #ccc; position: relative;
         }
         .list-item.chem { border-color: var(--chem); }
         .list-item.bio { border-color: var(--bio); }
         .list-item.phys { border-color: var(--phys); }
-
         .q-num {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #b2bec3;
-            background: #f1f2f6;
-            padding: 2px 6px;
-            border-radius: 4px;
+            position: absolute; top: 10px; right: 10px; font-size: 0.8rem; font-weight: bold; color: #b2bec3; background: #f1f2f6; padding: 2px 6px; border-radius: 4px;
         }
-
-        .ans-hidden {
-            background: #ff7675;
-            color: transparent;
-            border-radius: 4px;
-            padding: 0 4px;
-            cursor: pointer;
-            user-select: none;
-        }
+        .ans-hidden { background: #ff7675; color: transparent; border-radius: 4px; padding: 0 4px; cursor: pointer; user-select: none; }
         .ans-hidden.revealed { background: transparent; color: #d63031; font-weight: bold; }
-        
         .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--dark);
-            color: white;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-size: 1.5rem;
-            border: none;
-            cursor: pointer;
-            z-index: 50;
+            position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; width: 56px; height: 56px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.5rem; border: none; cursor: pointer; z-index: 50;
         }
-
-        /* --- Animations --- */
-        @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
         .anim-pop { animation: pop 0.4s forwards; }
 
     </style>
@@ -567,75 +450,54 @@
         <div style="text-align:center; margin-bottom:1rem; font-weight:bold; color:#636e72;">
             📖 フラッシュカードモード <br> <span id="fc-category-name" style="font-size:0.8rem"></span>
         </div>
-        
         <div class="fc-counter" id="fc-counter">1 / 30</div>
-        
         <div class="card" onclick="Flashcard.toggleAnswer()">
             <span class="badge-type" id="fc-badge">CHEM</span>
             <div id="fc-question">問題文</div>
-            
             <div id="fc-answer-area" class="flashcard-answer-area">
                 <div style="font-weight:bold; color:#d63031; font-size:1.3rem; margin-bottom:0.5rem;">A. <span id="fc-answer">答え</span></div>
                 <div style="font-size:0.9rem; color:#636e72; text-align:left; background:#f1f2f6; padding:10px; border-radius:8px;" id="fc-exp">解説</div>
             </div>
-            
             <div style="margin-top:1rem; color:#ccc; font-size:0.8rem;">(タップして答えを表示)</div>
         </div>
-
         <div class="flashcard-controls">
             <button class="btn-nav" onclick="Flashcard.prev()">◀ 前へ</button>
             <button class="btn-nav" onclick="Flashcard.next()">次へ ▶</button>
         </div>
-
         <div style="text-align:center; margin-top:2rem;">
             <button onclick="App.goHome()" style="background:none; border:none; color:#636e72; font-size:0.9rem; cursor:pointer; text-decoration:underline;">🏠 メニューへ戻る</button>
         </div>
     </div>
 
-
     <!-- LIST SCREEN -->
     <div id="screen-list" class="screen">
-        <!-- List Header -->
         <div class="list-header-area">
             <button class="btn-back-list" onclick="App.goHome()">
                 <span style="font-size:1.2rem; margin-right:4px;">←</span> ホームに戻る
             </button>
             <div class="list-stats">全 <span id="list-total-count">0</span> 問</div>
         </div>
-
-        <!-- Tabs -->
         <div class="tab-container">
             <button id="tab-chem" class="tab-btn t-chem" onclick="App.switchTab('chem')">化学</button>
             <button id="tab-bio" class="tab-btn t-bio" onclick="App.switchTab('bio')">生物</button>
             <button id="tab-phys" class="tab-btn t-phys" onclick="App.switchTab('phys')">物理</button>
         </div>
-
         <div id="list-container" class="list-container"></div>
-        
-        <!-- Floating Action Button (Alternative Back) -->
         <button class="fab" onclick="App.goHome()">🏠</button>
     </div>
 </main>
 
-<!-- SETTINGS MODAL (New Multi-step) -->
+<!-- SETTINGS MODAL -->
 <div id="modal-settings" class="modal-overlay">
     <div class="modal-content">
         <h2 id="settings-title">設定</h2>
-        
-        <!-- Step 1: Mode Selection -->
         <div id="settings-step-1">
             <p class="settings-label">学習モードを選んでください</p>
             <div class="mode-grid">
-                <button class="btn-select" onclick="App.selectMode('quiz')">
-                    🎮 演習 (4択テスト)<br><small style="font-weight:normal; color:#666">ランダム出題・習熟度UP</small>
-                </button>
-                <button class="btn-select" onclick="App.selectMode('flashcard')">
-                    📖 フラッシュカード (暗記)<br><small style="font-weight:normal; color:#666">順番通り・確認のみ</small>
-                </button>
+                <button class="btn-select" onclick="App.selectMode('quiz')">🎮 演習 (4択テスト)<br><small style="font-weight:normal; color:#666">ランダム出題・習熟度UP</small></button>
+                <button class="btn-select" onclick="App.selectMode('flashcard')">📖 フラッシュカード (暗記)<br><small style="font-weight:normal; color:#666">順番通り・確認のみ</small></button>
             </div>
         </div>
-
-        <!-- Step 2: Count Selection (Only for Quiz) -->
         <div id="settings-step-2" style="display:none;">
             <p class="settings-label">問題数を選んでください</p>
             <div class="count-grid">
@@ -645,23 +507,20 @@
                 <button class="btn-count" onclick="App.startQuiz(999)" style="background:var(--dark); color:white;">全問</button>
             </div>
         </div>
-
         <button class="btn-main" onclick="document.getElementById('modal-settings').style.display='none'" style="background:#95a5a6; margin-top:1.5rem;">キャンセル</button>
     </div>
 </div>
 
-<!-- RESULT/EXPLANATION MODAL -->
+<!-- RESULT MODAL -->
 <div id="modal-result" class="modal-overlay">
     <div class="modal-content">
         <span id="res-icon" class="result-icon">⭕</span>
         <h2 id="res-title" style="margin:0 0 1rem 0;">正解！</h2>
         <div id="res-ans-display" style="margin-bottom:1rem;"></div>
-        
         <div class="exp-box">
             <div id="res-exp">解説テキスト</div>
             <span class="exp-tag">高校入試・基礎固めポイント</span>
         </div>
-
         <button id="btn-next" class="btn-main" onclick="Game.nextQuestion()">次の問題へ</button>
     </div>
 </div>
@@ -670,27 +529,17 @@
 <div id="modal-ranking" class="modal-overlay">
     <div class="modal-content">
         <h2>🏆 ランキング (Top 5)</h2>
-        <ul id="ranking-list" class="ranking-list">
-            <!-- Injected by JS -->
-        </ul>
+        <ul id="ranking-list" class="ranking-list"></ul>
         <button class="btn-main" onclick="document.getElementById('modal-ranking').style.display='none'" style="margin-top:1rem;">閉じる</button>
     </div>
 </div>
 
 <script>
-/**
- * ---------------------------------------------------------
- * DATA & CONFIGURATION
- * ---------------------------------------------------------
- */
-const CONFIG = {
-    ver: "ver 3.6.9",
-    passScore: 2 // 2 times to master
-};
+const CONFIG = { ver: "ver 3.6.8", passScore: 2 };
 
-// 問題データベース
+// --- 問題データ (全178問) ---
 const QUESTIONS = [
-    // --- 化学 (Chemistry) 72問 ---
+    // 化学
     { id: 'c1', type: 'chem', q: '塩化銅水溶液を電気分解したとき、陰極に付着する物質は？', choices: ['銅', '塩素', '水素', '酸素'], ans: '銅', exp: '陰極には陽イオン（Cu²⁺）が引き寄せられ、銅原子になります。' },
     { id: 'c2', type: 'chem', q: 'アンモニアを集める最も適した方法は？', choices: ['上方置換法', '下方置換法', '水上置換法', '蒸留'], ans: '上方置換法', exp: 'アンモニアは水に溶けやすく、空気より軽いため上方置換法を用います。' },
     { id: 'c3', type: 'chem', q: '酸化銀を熱分解すると何色から何色に変わる？', choices: ['黒色から白色', '白色から黒色', '赤色から黒色', '黒色から赤色'], ans: '黒色から白色', exp: '酸化銀は黒色、分解してできる銀は白色です。' },
@@ -741,11 +590,19 @@ const QUESTIONS = [
     { id: 'c48', type: 'chem', q: '硫酸バリウムの化学式は？', choices: ['BaSO₄', 'Ba₂SO₄', 'Ba(SO₄)₂', 'BaS'], ans: 'BaSO₄', exp: '水に溶けにくい白い沈殿となります。' },
     { id: 'c49', type: 'chem', q: '硫化鉄の化学式は？', choices: ['FeS', 'FeS₂', 'Fe₂S', 'Fe₂S₃'], ans: 'FeS', exp: '鉄と硫黄の混合物を加熱するとできます。' },
     { id: 'c50', type: 'chem', q: '塩化水素の化学式は？', choices: ['HCl', 'H₂Cl', 'HCl₂', 'ClH'], ans: 'HCl', exp: '水に溶けると塩酸になります。' },
+    { id: 'c64', type: 'chem', q: '炭酸イオンのイオン式は？', choices: ['CO₃²⁻', 'CO₃⁻', 'C⁴⁺', 'CO₂'], ans: 'CO₃²⁻', exp: '2価の陰イオンです。' },
+    { id: 'c65', type: 'chem', q: 'アンモニウムイオンのイオン式は？', choices: ['NH₄⁺', 'NH₃⁺', 'NH₄⁻', 'N³⁻'], ans: 'NH₄⁺', exp: '多原子イオンで、1価の陽イオンです。' },
+    { id: 'c66', type: 'chem', q: '水酸化物イオンのイオン式は？', choices: ['OH⁻', 'OH⁺', 'O²⁻', 'H⁺'], ans: 'OH⁻', exp: 'アルカリ性を示す原因となるイオンです。' },
+    { id: 'c67', type: 'chem', q: '銅イオンのイオン式は？', choices: ['Cu²⁺', 'Cu⁺', 'Cu³⁺', 'Cu⁻'], ans: 'Cu²⁺', exp: '水溶液中では青色を示します。' },
+    { id: 'c68', type: 'chem', q: '銀イオンのイオン式は？', choices: ['Ag⁺', 'Ag²⁺', 'Ag⁻', 'Ag³⁺'], ans: 'Ag⁺', exp: '1価の陽イオンです。' },
+    { id: 'c69', type: 'chem', q: 'マグネシウムイオンのイオン式は？', choices: ['Mg²⁺', 'Mg⁺', 'Mg³⁺', 'Mg⁻'], ans: 'Mg²⁺', exp: '2価の陽イオンです。' },
+    { id: 'c70', type: 'chem', q: 'アルミニウムイオンのイオン式は？', choices: ['Al³⁺', 'Al²⁺', 'Al⁺', 'Al⁴⁺'], ans: 'Al³⁺', exp: '3価の陽イオンです。' },
+    { id: 'c71', type: 'chem', q: '水素イオンのイオン式は？', choices: ['H⁺', 'H⁻', 'H²⁺', 'OH⁻'], ans: 'H⁺', exp: '酸性を示す原因となるイオンです。' },
+    { id: 'c72', type: 'chem', q: '硫酸銅水溶液の電離を表す式は？', choices: ['CuSO₄ → Cu²⁺ + SO₄²⁻', 'CuSO₄ → Cu⁺ + SO₄⁻', 'CuSO₄ → Cu + S + 4O', 'CuSO₄ → Cu²⁺ + S²⁻ + 4O²⁻'], ans: 'CuSO₄ → Cu²⁺ + SO₄²⁻', exp: '銅イオン(Cu²⁺)と硫酸イオン(SO₄²⁻)に電離します。' },
     { id: 'c51', type: 'chem', q: '塩酸の電離を表す式は？', choices: ['HCl → H⁺ + Cl⁻', 'HCl → H + Cl', 'HCl → H⁻ + Cl⁺', 'HCl → H₂ + Cl₂'], ans: 'HCl → H⁺ + Cl⁻', exp: '水素イオンと塩化物イオンに電離します。' },
     { id: 'c52', type: 'chem', q: '塩化ナトリウム水溶液の電離を表す式は？', choices: ['NaCl → Na⁺ + Cl⁻', 'NaCl → Na + Cl', 'NaCl → Na⁻ + Cl⁺', 'NaCl → Na²⁺ + Cl²⁻'], ans: 'NaCl → Na⁺ + Cl⁻', exp: 'ナトリウムイオンと塩化物イオンに電離します。' },
     { id: 'c53', type: 'chem', q: '塩化銅水溶液の電離を表す式は？', choices: ['CuCl₂ → Cu²⁺ + 2Cl⁻', 'CuCl₂ → Cu⁺ + Cl₂⁻', 'CuCl → Cu⁺ + Cl⁻', 'CuCl₂ → Cu + Cl₂'], ans: 'CuCl₂ → Cu²⁺ + 2Cl⁻', exp: '銅イオン(Cu²⁺)と塩化物イオン(Cl⁻)に電離します。係数に注意！' },
     { id: 'c54', type: 'chem', q: '水酸化ナトリウム水溶液の電離を表す式は？', choices: ['NaOH → Na⁺ + OH⁻', 'NaOH → Na + OH', 'NaOH → Na⁺ + O²⁻ + H⁺', 'NaOH → N⁺ + aOH⁻'], ans: 'NaOH → Na⁺ + OH⁻', exp: 'ナトリウムイオンと水酸化物イオンに電離します。' },
-    { id: 'c72', type: 'chem', q: '硫酸銅水溶液の電離を表す式は？', choices: ['CuSO₄ → Cu²⁺ + SO₄²⁻', 'CuSO₄ → Cu⁺ + SO₄⁻', 'CuSO₄ → Cu + S + 4O', 'CuSO₄ → Cu²⁺ + S²⁻ + 4O²⁻'], ans: 'CuSO₄ → Cu²⁺ + SO₄²⁻', exp: '銅イオン(Cu²⁺)と硫酸イオン(SO₄²⁻)に電離します。' },
     { id: 'c55', type: 'chem', q: '塩酸の電気分解の化学反応式は？', choices: ['2HCl → H₂ + Cl₂', 'HCl → H + Cl', 'HCl → H₂ + Cl₂', '2HCl → 2H + 2Cl'], ans: '2HCl → H₂ + Cl₂', exp: '水素と塩素が発生します。' },
     { id: 'c56', type: 'chem', q: '塩化銅水溶液の電気分解の化学反応式は？', choices: ['CuCl₂ → Cu + Cl₂', 'CuCl₂ → Cu + 2Cl', '2CuCl → 2Cu + Cl₂', 'CuCl → Cu + Cl'], ans: 'CuCl₂ → Cu + Cl₂', exp: '銅と塩素が発生します。' },
     { id: 'c57', type: 'chem', q: '銅の酸化の化学反応式は？', choices: ['2Cu + O₂ → 2CuO', 'Cu + O → CuO', 'Cu + O₂ → CuO₂', '2Cu + O → Cu₂O'], ans: '2Cu + O₂ → 2CuO', exp: '銅原子と酸素分子が反応して酸化銅になります。' },
@@ -755,14 +612,6 @@ const QUESTIONS = [
     { id: 'c61', type: 'chem', q: '水の電気分解の化学反応式は？', choices: ['2H₂O → 2H₂ + O₂', 'H₂O → H₂ + O', '2H₂O → 2H₂ + 2O', 'H₂O → H + OH'], ans: '2H₂O → 2H₂ + O₂', exp: '水素と酸素が発生します。体積比は2:1です。' },
     { id: 'c62', type: 'chem', q: '炭酸水素ナトリウムの熱分解の化学反応式は？', choices: ['2NaHCO₃ → Na₂CO₃ + H₂O + CO₂', 'NaHCO₃ → NaCO₃ + H + O', '2NaHCO₃ → Na₂CO₃ + H₂ + O₂', 'NaHCO₃ → Na + H + C + O₃'], ans: '2NaHCO₃ → Na₂CO₃ + H₂O + CO₂', exp: '炭酸ナトリウム、水、二酸化炭素の3つに分解されます。' },
     { id: 'c63', type: 'chem', q: '硫酸イオンのイオン式は？', choices: ['SO₄²⁻', 'SO₄⁻', 'S²⁻', 'SO₃²⁻'], ans: 'SO₄²⁻', exp: '2価の陰イオンです。' },
-    { id: 'c64', type: 'chem', q: '炭酸イオンのイオン式は？', choices: ['CO₃²⁻', 'CO₃⁻', 'C⁴⁺', 'CO₂'], ans: 'CO₃²⁻', exp: '2価の陰イオンです。' },
-    { id: 'c65', type: 'chem', q: 'アンモニウムイオンのイオン式は？', choices: ['NH₄⁺', 'NH₃⁺', 'NH₄⁻', 'N³⁻'], ans: 'NH₄⁺', exp: '多原子イオンで、1価の陽イオンです。' },
-    { id: 'c66', type: 'chem', q: '水酸化物イオンのイオン式は？', choices: ['OH⁻', 'OH⁺', 'O²⁻', 'H⁺'], ans: 'OH⁻', exp: 'アルカリ性を示す原因となるイオンです。' },
-    { id: 'c67', type: 'chem', q: '銅イオンのイオン式は？', choices: ['Cu²⁺', 'Cu⁺', 'Cu³⁺', 'Cu⁻'], ans: 'Cu²⁺', exp: '水溶液中では青色を示します。' },
-    { id: 'c68', type: 'chem', q: '銀イオンのイオン式は？', choices: ['Ag⁺', 'Ag²⁺', 'Ag⁻', 'Ag³⁺'], ans: 'Ag⁺', exp: '1価の陽イオンです。' },
-    { id: 'c69', type: 'chem', q: 'マグネシウムイオンのイオン式は？', choices: ['Mg²⁺', 'Mg⁺', 'Mg³⁺', 'Mg⁻'], ans: 'Mg²⁺', exp: '2価の陽イオンです。' },
-    { id: 'c70', type: 'chem', q: 'アルミニウムイオンのイオン式は？', choices: ['Al³⁺', 'Al²⁺', 'Al⁺', 'Al⁴⁺'], ans: 'Al³⁺', exp: '3価の陽イオンです。' },
-    { id: 'c71', type: 'chem', q: '水素イオンのイオン式は？', choices: ['H⁺', 'H⁻', 'H²⁺', 'OH⁻'], ans: 'H⁺', exp: '酸性を示す原因となるイオンです。' },
 
     // --- 生物 (Biology) 76問 ---
     { id: 'b1', type: 'bio', q: 'だ液に含まれる消化酵素は？', choices: ['アミラーゼ', 'ペプシン', 'リパーゼ', 'トリプシン'], ans: 'アミラーゼ', exp: 'デンプンを麦芽糖などに分解します。' },
@@ -955,11 +804,13 @@ const App = {
             this.userData = JSON.parse(d);
             if (!this.userData.ranking) this.userData.ranking = [];
         } else {
+            // Migration from v2 if exists
             const v2 = localStorage.getItem('scienceApp_v2');
             if(v2) {
                 this.userData = JSON.parse(v2);
                 this.userData.ranking = [];
             }
+            // Initialize
             QUESTIONS.forEach(q => {
                 if(this.userData.mastery[q.id] === undefined) this.userData.mastery[q.id] = 0;
             });
@@ -1004,61 +855,45 @@ const App = {
         const names = { chem:'化学', bio:'生物', phys:'物理', mix:'全部ミックス', weak:'苦手特訓' };
         title.innerText = `${names[mode]} 設定`;
 
+        // Show Step 1
+        document.getElementById('settings-step-1').style.display = 'block';
+        document.getElementById('settings-step-2').style.display = 'none';
+
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('visible'), 10);
     },
-
-    startGame(count) {
+    
+    // NEW: Function to handle mode selection (Step 1 -> Step 2)
+    selectMode(mode) {
         AudioEngine.playClick();
-        const modal = document.getElementById('modal-settings');
-        modal.classList.remove('visible');
-        setTimeout(() => modal.style.display = 'none', 200);
+        if (mode === 'flashcard') {
+            // Flashcard Mode
+            this.closeSettings();
+            Flashcard.init(this.pendingMode); // Start with selected category
+            this.switchScreen('screen-flashcard');
+        } else {
+            // Quiz Mode (Proceed to Step 2)
+             if (this.pendingMode === 'weak') {
+                // Weak mode has no count selection, start immediately
+                this.startQuiz(999);
+            } else {
+                document.getElementById('settings-step-1').style.display = 'none';
+                document.getElementById('settings-step-2').style.display = 'block';
+            }
+        }
+    },
 
+    startQuiz(count) {
+        AudioEngine.playClick();
+        this.closeSettings();
         Game.init(this.pendingMode, count);
         this.switchScreen('screen-game');
     },
 
-    showList() {
-        AudioEngine.playClick();
-        this.switchScreen('screen-list');
-        this.switchTab(this.currentListTab);
-    },
-
-    switchTab(type) {
-        this.currentListTab = type;
-        
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`tab-${type}`);
-        if(activeBtn) activeBtn.classList.add('active');
-
-        const container = document.getElementById('list-container');
-        container.innerHTML = '';
-        
-        const filteredQs = QUESTIONS.filter(q => q.type === type);
-        document.getElementById('list-total-count').innerText = filteredQs.length;
-        
-        document.getElementById('tab-chem').innerText = `化学 (${QUESTIONS.filter(q=>q.type==='chem').length})`;
-        document.getElementById('tab-bio').innerText = `生物 (${QUESTIONS.filter(q=>q.type==='bio').length})`;
-        document.getElementById('tab-phys').innerText = `物理 (${QUESTIONS.filter(q=>q.type==='phys').length})`;
-
-        filteredQs.forEach((q, index) => {
-            const mastery = this.userData.mastery[q.id] || 0;
-            const isMastered = mastery >= CONFIG.passScore;
-            
-            const div = document.createElement('div');
-            div.className = `list-item ${q.type}`;
-            div.innerHTML = `
-                <div class="q-num">No.${index + 1}</div>
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px; padding-right: 40px;">
-                    <span style="font-weight:bold; text-transform:uppercase; color:#888;">${q.type}</span>
-                    <span style="color:${isMastered ? '#00b894' : '#d63031'}">${isMastered ? '★習得済' : '未習得'}</span>
-                </div>
-                <div style="margin-bottom:0.5rem; font-weight:bold; padding-right: 10px;">${q.q}</div>
-                <div class="ans-hidden" onclick="this.classList.toggle('revealed')">A. ${q.ans}</div>
-                <div style="font-size:0.85rem; color:#636e72; margin-top:0.5rem; line-height:1.4;">${q.exp}</div>
-            `;
-            container.appendChild(div);
-        });
+    closeSettings() {
+        const modal = document.getElementById('modal-settings');
+        modal.classList.remove('visible');
+        setTimeout(() => modal.style.display = 'none', 200);
     },
 
     saveScore(score, mode) {
@@ -1069,6 +904,7 @@ const App = {
             date: new Date().toLocaleDateString()
         });
         
+        // Sort and keep top 5
         this.userData.ranking.sort((a, b) => b.score - a.score);
         this.userData.ranking = this.userData.ranking.slice(0, 5);
         
@@ -1352,6 +1188,85 @@ const Game = {
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
+    }
+};
+
+// --- FLASHCARD LOGIC ---
+const Flashcard = {
+    list: [], currentIndex: 0,
+    
+    init(category) {
+        // Prepare list: if mix or weak, logic differs slightly, but mainly just sequential list
+        let pool = [];
+        if (category === 'mix') pool = QUESTIONS;
+        else if (category === 'weak') {
+            pool = QUESTIONS.filter(q => (App.userData.mastery[q.id] || 0) < CONFIG.passScore);
+            if(pool.length === 0) { alert("苦手な問題はありません！"); App.goHome(); return; }
+        } else {
+            pool = QUESTIONS.filter(q => q.type === category);
+        }
+        
+        // No shuffle, preserve order (ID order in array)
+        this.list = pool;
+        this.currentIndex = 0;
+        
+        // UI Setup
+        const names = { chem:'化学', bio:'生物', phys:'物理', mix:'全部ミックス', weak:'苦手特訓' };
+        document.getElementById('fc-category-name').innerText = names[category] || category;
+        
+        this.render();
+    },
+    
+    render() {
+        if (this.list.length === 0) return;
+        
+        const q = this.list[this.currentIndex];
+        const typeNames = { chem: '化学', bio: '生物', phys: '物理' };
+        
+        // Update Counter
+        document.getElementById('fc-counter').innerText = `${this.currentIndex + 1} / ${this.list.length}`;
+        
+        // Update Content
+        const badge = document.getElementById('fc-badge');
+        let color = 'var(--dark)';
+        if(q.type === 'chem') color = 'var(--chem)';
+        if(q.type === 'bio') color = 'var(--bio)';
+        if(q.type === 'phys') color = 'var(--phys)';
+        badge.style.background = color;
+        badge.innerText = typeNames[q.type] || q.type;
+        
+        document.getElementById('fc-question').innerText = q.q;
+        document.getElementById('fc-answer').innerText = q.ans;
+        document.getElementById('fc-exp').innerHTML = q.exp;
+        
+        // Reset Answer visibility
+        document.getElementById('fc-answer-area').classList.remove('visible');
+    },
+    
+    toggleAnswer() {
+        AudioEngine.playClick();
+        document.getElementById('fc-answer-area').classList.toggle('visible');
+    },
+    
+    next() {
+        AudioEngine.playClick();
+        if (this.currentIndex < this.list.length - 1) {
+            this.currentIndex++;
+            this.render();
+        } else {
+            if(confirm('最後の問題です。最初に戻りますか？')) {
+                this.currentIndex = 0;
+                this.render();
+            }
+        }
+    },
+    
+    prev() {
+        AudioEngine.playClick();
+        if (this.currentIndex > 0) {
+            this.currentIndex--;
+            this.render();
+        }
     }
 };
 
