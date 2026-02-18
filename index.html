@@ -535,7 +535,7 @@
 </div>
 
 <script>
-const CONFIG = { ver: "ver 3.6.8", passScore: 2 };
+const CONFIG = { ver: "ver 3.6.9", passScore: 2 };
 
 // --- 問題データ (全178問) ---
 const QUESTIONS = [
@@ -939,6 +939,50 @@ const App = {
         const modal = document.getElementById('modal-ranking');
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('visible'));
+    },
+
+    // --- RE-ADDED: showList and switchTab ---
+    showList() {
+        AudioEngine.playClick();
+        this.switchScreen('screen-list');
+        this.switchTab(this.currentListTab);
+    },
+
+    switchTab(type) {
+        this.currentListTab = type;
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`tab-${type}`);
+        if(activeBtn) activeBtn.classList.add('active');
+
+        const container = document.getElementById('list-container');
+        container.innerHTML = '';
+        
+        const filteredQs = QUESTIONS.filter(q => q.type === type);
+        document.getElementById('list-total-count').innerText = filteredQs.length;
+        
+        document.getElementById('tab-chem').innerText = `化学 (${QUESTIONS.filter(q=>q.type==='chem').length})`;
+        document.getElementById('tab-bio').innerText = `生物 (${QUESTIONS.filter(q=>q.type==='bio').length})`;
+        document.getElementById('tab-phys').innerText = `物理 (${QUESTIONS.filter(q=>q.type==='phys').length})`;
+
+        filteredQs.forEach((q, index) => {
+            const mastery = this.userData.mastery[q.id] || 0;
+            const isMastered = mastery >= CONFIG.passScore;
+            
+            const div = document.createElement('div');
+            div.className = `list-item ${q.type}`;
+            div.innerHTML = `
+                <div class="q-num">No.${index + 1}</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px; padding-right: 40px;">
+                    <span style="font-weight:bold; text-transform:uppercase; color:#888;">${q.type}</span>
+                    <span style="color:${isMastered ? '#00b894' : '#d63031'}">${isMastered ? '★習得済' : '未習得'}</span>
+                </div>
+                <div style="margin-bottom:0.5rem; font-weight:bold; padding-right: 10px;">${q.q}</div>
+                <div class="ans-hidden" onclick="this.classList.toggle('revealed')">A. ${q.ans}</div>
+                <div style="font-size:0.85rem; color:#636e72; margin-top:0.5rem; line-height:1.4;">${q.exp}</div>
+            `;
+            container.appendChild(div);
+        });
     },
 
     goHome() {
